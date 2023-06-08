@@ -6,7 +6,11 @@ const socket = io('http://localhost:3001')
 function SignIn({setIsAuth}) {
     const [pseudo, setPseudo] = useState('');
     const signin = (event) => {
-        socket.emit('signin', pseudo)
+        socket.emit('signin', {pseudo: pseudo}, (error) => {
+          if (error) {
+            alert(error)
+          }
+        })
         setIsAuth(true);
     }
   return (
