@@ -1,12 +1,10 @@
 import { useState} from 'react'
-import io from 'socket.io-client'
-
-const socket = io('http://localhost:3001')
+import { socket,} from './MyCustomSocket';
 
 function SignIn({setIsAuth}) {
     const [pseudo, setPseudo] = useState('');
     const signin = (event) => {
-        socket.emit('signin', {pseudo: pseudo}, (error) => {
+        socket.emit('signin', pseudo, (error) => {
           if (error) {
             alert(error)
           }

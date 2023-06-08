@@ -1,18 +1,26 @@
 import './App.css';
 import SignIn from './Components/SignIn';
+import Channels from './Components/Channels';
 import {useState} from'react';
-import io from 'socket.io-client';
+import { socket } from './Components/MyCustomSocket';
 
-const socket = io('http://localhost:3001');
 function App() {
   const [isAuth,setisAuth] = useState(false);
+  const [userslist,setusersList] = useState([]);
   const logOut = () => {
     setisAuth(false);
     socket.emit('logout');
   }
+  socket.on('userlist', (data) =>{
+    console.log(Array.from(data));
+    setusersList(Array.from(data));
+  });
   return (<div className="App">
     {isAuth? (
+      <div>
+      <Channels userslist={userslist}/>
       <button onClick={logOut}>Log Out</button>
+      </div>
       ):(
       <SignIn setIsAuth={setisAuth}/>
       )}

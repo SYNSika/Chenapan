@@ -17,22 +17,29 @@ const io = new Server(server, {
 app.use(cors());
 
 io.on('connection', (socket) => {
-    socket.on('signin', function(data,callback) {
-        const user = addUser(data.pseudo,this.id);
+    console.log(socket.id)
+    socket.on('signin', function(username,callback) {
+        const user = addUser(username,this.id);
         if(user.error) return callback(error);
         console.log('someone connected to the server');
-        console.log(user.pseudo,'has join');
-        socket.broadcast.emit('user joined', user);
-        socket.emit('alluserdata',getAllUsers());
+        console.log(user.username,'has join');
+
+        socket.emit('userlist',getAllUsers());
     })
     socket.on('logout', function() {
         const user = removeUser(socket.id);
         if(user) {
             console.log('someone disconnected from the server')
-            console.log(user.pseudo,' has left');
+            console.log(user.username,' has left');
         }
+        socket.emit('userlist',getAllUsers());
     })
 });
+
+setInterval(function() {
+    const users = getAllUsers();
+    io.emit('userlist',users);
+},10000)
 
 server.listen(3001, () => {
     console.log('listening on *:3001');

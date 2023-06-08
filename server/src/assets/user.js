@@ -1,11 +1,11 @@
 const users = [];
 
-const addUser = (pseudo, id) => {
-    const existingUser = users.find(user => {user.pseudo === pseudo && user.id === id});
+const addUser = (username, id) => {
+    const existingUser = users.find(user => {user.username === username && user.id === id});
     if(existingUser){
         return {error : "pseudo déjà utilisé"};
     }
-    const user = {pseudo, id};
+    const user = {username, id};
 
     users.push(user);
     return user;
