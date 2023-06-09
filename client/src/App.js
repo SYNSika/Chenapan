@@ -12,8 +12,8 @@ function App() {
     socket.emit('logout');
   }
   socket.on('userlist', (data) =>{
-    console.log(Array.from(data));
-    setusersList(Array.from(data));
+
+    setusersList(data);
   });
   return (<div className="App">
     {isAuth? (
