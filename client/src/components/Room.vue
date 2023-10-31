@@ -1,10 +1,9 @@
 <template>
     <div class="single-room" @click="joinRoom">
-        <p>{{  }}</p>
+        <p>{{ roomId }}</p>
     </div>
 </template>
 <script>
-import { type } from 'os';
 import { mapActions } from 'vuex';
 export default {
     name: 'SingleRoom',

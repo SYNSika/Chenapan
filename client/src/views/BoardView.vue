@@ -8,7 +8,7 @@ import { mapState } from 'vuex';
 import Board from '@/components/Board.vue';
 
 export default {
-    name: BoardView,
+    name: "BoardView",
     components: {
         Board
     },

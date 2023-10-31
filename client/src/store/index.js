@@ -30,7 +30,7 @@ export default createStore({
 
       let str1 = state.cells.at(index1)
       let str2 = state.cells.at(index2)
-      let str3 = state.cells.at(index1 + (index2 - index) / 2)
+      let str3 = state.cells.at(index1 + (index2 - index1) / 2)
 
       const delta = Math.abs(index2 - index1)
       let swap = false
