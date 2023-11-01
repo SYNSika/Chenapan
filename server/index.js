@@ -13,6 +13,13 @@ let rooms = []
 io.on('connection', (socket) => {
     console.log('A user just connected ' + socket.id)
 
+    socket.on('play', (move) => {
+        let playerRoom = rooms.find(room => room.playersList.includes(socket.id))
+        if(playerRoom != undefined) {
+            socket.broadcast.to(playerRoom.roomId).emit('play',move)
+        }
+    })
+    
     socket.on('createRoom', (callback) => {
         let roomId = (+new Date).toString(36)
         let room = {
@@ -26,13 +33,13 @@ io.on('connection', (socket) => {
         callback(roomId)
         console.log('new room created')
     })
-    socket.on('joinRoom', (roomId,callback) => {
-        let room = rooms.find(room => room.roomId == roomId)
+    socket.on('joinRoom', (roomId, callback) => {
+        console.log(roomId)
         let index = rooms.findIndex(room => room.roomId == roomId)
-        if(room === undefined) {
+        if(index == -1) {
             console.log("this room doesn't existed")
             callback(false)
-        } else if(room.playersList.length >= 2){
+        } else if(rooms[index].playersList.length >= 2){
             console.log('this room is full')
             callback(false)
         }else {
@@ -54,7 +61,7 @@ io.on('connection', (socket) => {
             if(rooms[index].playersList.length === 0) {
                 rooms = rooms.filter(room => room.roomId != roomId)
                 let roomsId = getList(rooms)
-                io.emit('getRooms',roomId)
+                io.emit('getRooms',roomsId)
             }
             socket.leave(roomId)
             callback(true)
@@ -62,6 +69,7 @@ io.on('connection', (socket) => {
         }
     })
     socket.on('getRooms', (callback) => {
+        rooms = rooms.filter(room => room.playersList.length != 0)
         let roomsId = getList(rooms)
         callback(roomsId)
     })

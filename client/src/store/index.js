@@ -21,7 +21,7 @@ export default createStore({
 
     isMyTurn: false,
     inRoom: false,
-    coinJoinRoom: true,
+    canJoinRoom: true,
   },
   getters: {
     isSwapPossible: (state) => {
@@ -138,26 +138,24 @@ export default createStore({
           str2["A", "R", "0"]
           for (let i = 0; i < arr.length; i++) {
             let newIndexPos = index + arr[i]
+            let newIndexPosDelta = index + (arr[i]/2)
             let newIndexNeg = index - arr[i]
-            if (newIndexPos < len && (index + arr[i]) % 5 >= index % 5 && !str2.includes(state.cells.at(newIndexPos))) {
-              state.cellsBackColor[index + arr[i]] = 2
+            let newIndexNegDelta = index - (arr[i]/2)
+            if (newIndexPos < len && (newIndexPos) % 5 >= index % 5 && !str2.includes(state.cells.at(newIndexPos)) && !str2.includes(state.cells.at(newIndexPosDelta))) {
+              state.cellsBackColor[newIndexPos] = 2
             }
-            if (newIndexNeg >= 0 && (index - arr[i]) % 5 <= index % 5 && !str2.includes(state.cells.at(newIndexNeg))) {
-              state.cellsBackColor[index - arr[i]] = 2
+            if (newIndexNeg >= 0 && (newIndexNeg) % 5 <= index % 5 && !str2.includes(state.cells.at(newIndexNeg)) && !str2.includes(state.cells.at(newIndexNegDelta))) {
+              state.cellsBackColor[newIndexNeg] = 2
             }
           }
           break;
         case "V":
-          arr = [3, 7, 9, 11]
+          arr = [3, 7, 9, 11, -3, -7, -9, -11]
           str2["A", "R", "D", "0"]
           for (let i = 0; i < arr.length; i++) {
-            let newIndexPos = index + arr[i]
-            let newIndexNeg = index - arr[i]
-            if (newIndexPos < len && !str2.includes(state.cells.at(newIndexPos))) {
-              state.cellsBackColor[index + arr[i]] = 2
-            }
-            if (newIndexNeg >= 0 && !str2.includes(state.cells.at(newIndexNeg))) {
-              state.cellsBackColor[index - arr[i]] = 2
+            let newIndex = index + arr[i]
+            if ( (0 <= newIndex < len) && !str2.includes(state.cells.at(newIndex))) {
+              state.cellsBackColor[newIndex] = 2
             }
           }
           break;
@@ -187,6 +185,11 @@ export default createStore({
       for (let i = 0; i < len; i++) {
         state.cellsBackColor[i] = 0
       }
+    },
+    createBoard: state => {
+      state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
+      state.cellsColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      state.cellsBackColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
   },
   actions: {
@@ -220,15 +223,21 @@ export default createStore({
       socket.emit("createRoom", (roomId) => {
         context.state.roomId = roomId
         context.state.inRoom = true
+        context.state.isMyTurn = true
         router.push(`/room/${roomId}`)
       })
     },
     joinRoom: (context, roomId) => {
-      socket.emit('joinRoom', roomId, (reponse) => {
+      console.log(roomId)
+      socket.emit('joinRoom',roomId, (reponse) => {
         if(reponse) {
-          router.push(`/room/${roomId}`)
+          context.state.roomId = roomId
           context.state.inRoom = true
           context.state.isMyTurn = false
+          router.push(`/room/${roomId}`)
+          
+        } else {
+          alert('error Room')
         }
       })
     },
@@ -240,7 +249,16 @@ export default createStore({
           context.state.roomId = ""
         }
       })
-
+    },
+    generateBoard: (context) => {
+      context.commit("createBoard")
+    },
+    getBoardFromRoom: (context) => {
+      socket.emit('getBoardFromRoom',context.state.roomId, (response) => {
+        context.state.cells = response.cells
+        context.state.cellsColor = response.cellsColor
+        context.state.cellsBackColor = response.cellsBackColor
+      })
     }
   },
   modules: {

@@ -11,5 +11,13 @@ socket.on('play',(move) => {
     store.dispatch('otherPlayerMove',move)
     store.state.isMyTurn = true
 })
+socket.on('getBoard',(callback) => {
+    let roomInfo = {
+        cells: store.state.cells,
+        cellsColor: store.state.cellsColor,
+        cellsBackColor: store.state.cellsBackColor
+    }
+    callback(roomInfo)
+})
 
 export default socket

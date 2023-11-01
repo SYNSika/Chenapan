@@ -1,5 +1,5 @@
 <template>
-    <div class="single-room" @click="joinRoom">
+    <div class="single-room" @click="joinRoom(roomId)">
         <p>{{ roomId }}</p>
     </div>
 </template>
@@ -22,5 +22,6 @@ export default {
 .single-room {
     border: 2px black;
     border-radius: 5px;
+    text-align: center;
 }
 </style>

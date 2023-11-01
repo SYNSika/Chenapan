@@ -1,10 +1,9 @@
 <template>
     <div>
-        <Board :key="roomId" :roomId="roomId" />
+        <Board/>
     </div>
 </template>
 <script>
-import { mapState } from 'vuex';
 import Board from '@/components/Board.vue';
 
 export default {
@@ -12,9 +11,6 @@ export default {
     components: {
         Board
     },
-    computed: {
-        ...mapState(["roomId"])
-    }
 }
 </script>
 <style lang="scss">

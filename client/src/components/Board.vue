@@ -4,39 +4,35 @@
             <p></p>
         </div>
         <div class="board-game">
-            <BoardCell v-for="(cell,index) in cells"
-            :key="index"
-            :index="index"
-            :value="cell"
-            :color="cellsColor[index]"
-            :backColor="cellsBackColor[index]"/>
+            <BoardCell v-for="(cell, index) in cells" :key="index" :index="index" :value="cell" :color="cellsColor[index]"
+                :backColor="cellsBackColor[index]" :updateSwapCells="updateSwapCells" />
         </div>
-        <div class="is-turn" :class="[isMyTurn ? '' : 'is-turn_not' ]">
+        <div class="is-turn" :class="[isMyTurn ? '' : 'is-turn_not']">
             <p v-if="isMyTurn">A votre tour</p>
             <p v-else>A l'adversaire</p>
         </div>
     </div>
+    <button class="leave-room-button" @click="leaveRoom">Quitter la room</button>
 </template>
 <script>
 import BoardCell from './BoardCell.vue';
 import { mapState, mapActions } from 'vuex';
+import store from '@/store';
 
 export default {
     name: "GameBoard",
     components: {
         BoardCell
     },
-    props:{
-        roomId: {
-            type: String,
-            required: true
-        }
-    },
     computed: {
-        ...mapState(["cells","cellsColor","cellsBackColor","isMyTurn"])
+        ...mapState(["cells", "cellsColor", "cellsBackColor", "isMyTurn"])
     },
     methods: {
-        ...mapActions(["leaveRoom"])
+        ...mapActions(["leaveRoom", "updateSwapCells"])
+    },
+    beforeCreate() {
+        store.dispatch("generateBoard")
+
     }
 }
 </script>
@@ -64,6 +60,7 @@ export default {
     line-height: 50%;
     background-color: black;
     color: white;
+
     &_not {
         background-color: gray;
     }

@@ -5,7 +5,6 @@
     </div>
 </template>
 <script>
-import { mapActions } from 'vuex';
 
 export default {
     name: 'BoardCell',
@@ -24,6 +23,10 @@ export default {
         },
         backColor: {
             type: Number,
+            required: true
+        },
+        updateSwapCells: {
+            type: Function,
             required: true
         }
     },
@@ -45,9 +48,6 @@ export default {
             } else {
                 return "lightgreen"
             }
-        },
-        methods: {
-            ...mapActions(["updateSwapCells"])
         },
     }
 }

@@ -25,7 +25,7 @@ export default {
     methods: {
         ...mapActions(["createRoom"])
     },
-    beforeMount() {
+    mounted() {
         socket.emit("getRooms",(response) => {
             store.dispatch("updateRoomList",response)
         })
