@@ -1,6 +1,6 @@
 # Chenapan online
 
-In the project, I am 
+In the project, I am developping a VUEjs single page application with a NodeJs Backend to game the game Chenapan with remote player.
 
 ## Running backend
 
