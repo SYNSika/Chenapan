@@ -59,6 +59,6 @@ export default {
     border: 1px solid black;
     border-radius: 5px;
     text-align: center;
-    line-height: 250%;
+    line-height: 300%;
 }
 </style>
