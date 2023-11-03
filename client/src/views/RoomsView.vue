@@ -1,34 +1,46 @@
 <template>
-    <div class="room-list">
-        <SingleRoom v-for="(room,index) in roomsList"
-            :key="index"
-            :roomId="room"/>
-    </div>
-    <div class="create-room-button">
-        <button @click="createRoom">Créer une room</button>
-    </div>
+  <div class="room-list">
+    <SingleRoom v-for="(room, index) in roomList" :key="index" :roomId="room" />
+  </div>
+  <button class="create-room-button" @click="createRoom">Créer une room</button>
 </template>
 <script>
-import SingleRoom from '@/components/Room.vue'
-import { mapState,mapActions } from 'vuex';
-import socket from '@/socket';
-import store from '@/store';
+import SingleRoom from "@/components/Room.vue";
+import { mapState, mapActions } from "vuex";
 
 export default {
-    name: "RoomsView",
-    components : {
-        SingleRoom
-    },
-    computed: {
-        ...mapState(["roomsList"])
-    },
-    methods: {
-        ...mapActions(["createRoom"])
-    },
-    mounted() {
-        socket.emit("getRooms",(response) => {
-            store.dispatch("updateRoomList",response)
-        })
-    }
-}
+  name: "RoomsView",
+  components: {
+    SingleRoom,
+  },
+  computed: {
+    ...mapState(["roomList"]),
+  },
+  methods: {
+    ...mapActions(["createRoom"]),
+  },
+};
 </script>
+<style lang="scss">
+.room-list {
+  margin:0 auto;
+  border: 2px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: large;
+  vertical-align: auto;
+}
+.create-room-button {
+  margin: auto;
+  margin-top: 10px;
+  width: 150px;
+  height: 40px;
+  line-height: 50%;
+  text-align: center;
+  border-radius: 5px;
+  background-color: gold;
+}
+.create-room-button:hover {
+  background-color: goldenrod;
+}
+</style>

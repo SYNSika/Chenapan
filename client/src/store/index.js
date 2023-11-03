@@ -24,6 +24,9 @@ export default createStore({
     inRoom: false,
     canJoinRoom: true,
     isJoinningRoom: false,
+
+    isGameOver: false,
+    isGameWon: false,
   },
   getters: {
     isSwapPossible: (state) => {
@@ -104,6 +107,8 @@ export default createStore({
         state.cellsColor[index3] = tempCellColor
       }
       state.isMyTurn = false
+      let audio = new Audio(require('@/assets/move-self.mp3'))
+      audio.play();
     },
     addCellIndex: (state, index) => {
       state.selectedCells.push(index)
@@ -215,11 +220,29 @@ export default createStore({
         invertedMove.push(24 - move)
       })
       state.selectedCells = invertedMove
+    },
+    isGameOver: (state) => {
+      let pos = [0,1,2,3,4,20,21,22,23,24]
+      for(let i = 0; i<pos.length; i++){
+        if(state.cells.at(pos[i]) === "0") {
+          state.isGameOver = true
+          console.log("Partie Terminé")
+          if(pos[i] >= 20) {
+            state.isGameWon = true
+            console.log("Partie Gagné")
+          }
+          break;
+        }
+      }
+    },
+    updateRoomList: (state,rooms) => {
+      state.roomList = rooms
+      console.log(state.roomList)
     }
   },
   actions: {
     updateSwapCells: (context, index) => {
-      if (context.state.isMyTurn && context.getters.firstCellCorrectColor(index)) {
+      if (context.state.isMyTurn && context.getters.firstCellCorrectColor(index) && !context.state.isGameOver) {
         context.commit("addCellIndex", index)
         context.commit("changeCellBack", index)
         context.commit("changeAdjacentCellBack", index)
@@ -227,6 +250,7 @@ export default createStore({
         if (context.state.selectedCells.length === 2) {
           if (context.getters.isSwapPossible) {
             context.commit("swapCells")
+            context.commit("isGameOver")
             socket.emit('play', context.state.selectedCells)
           }
           context.state.selectedCells = []
@@ -237,10 +261,11 @@ export default createStore({
     otherPlayerMove: (context, move) => {
       context.commit("invertePlayerMove", move)
       context.commit("swapCells")
+      context.commit("isGameOver")
       context.state.selectedCells = []
     },
     updateRoomList: (context, rooms) => {
-      context.state.roomsList = rooms
+      context.commit("updateRoomList",rooms)
     },
     createRoom: (context) => {
       socket.emit("createRoom", (roomId) => {
@@ -274,19 +299,14 @@ export default createStore({
           context.state.roomId = ""
           context.state.isJoinningRoom = false
           context.state.playerColor = 2
+          context.state.isGameOver = false
+          context.state.isGameWon = false
         }
       })
     },
     generateBoard: (context) => {
       context.commit("createBoard")
     },
-    getBoardFromRoom: (context) => {
-      socket.emit('getBoardFromRoom', context.state.roomId, (response) => {
-        context.state.cells = response.cells
-        context.state.cellsColor = response.cellsColor
-        context.state.cellsBackColor = response.cellsBackColor
-      })
-    }
   },
   modules: {
   }

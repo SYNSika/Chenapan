@@ -1,4 +1,5 @@
 <template>
+    <PopUp :isGameOver="isGameOver" :isGameWon="isGameWon" />
   <div class="board">
     <div class="board-info">
       <p>{{ roomId }}</p>
@@ -23,6 +24,7 @@
 </template>
 <script>
 import BoardCell from "./BoardCell.vue";
+import PopUp from "./PopUp.vue";
 import { mapState, mapActions } from "vuex";
 import store from "@/store";
 
@@ -30,6 +32,7 @@ export default {
   name: "GameBoard",
   components: {
     BoardCell,
+    PopUp
   },
   computed: {
     ...mapState([
@@ -38,6 +41,8 @@ export default {
       "cellsBackColor",
       "isMyTurn",
       "roomId",
+      "isGameOver",
+      "isGameWon",
     ]),
   },
   methods: {
