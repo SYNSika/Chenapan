@@ -1,27 +1,27 @@
 <template>
-    <div class="single-room" @click="joinRoom(roomId)">
-        <p>{{ roomId }}</p>
-    </div>
+  <div class="single-room" @click="joinRoom(roomId)">
+    <p>{{ roomId }}</p>
+  </div>
 </template>
 <script>
-import { mapActions } from 'vuex';
+import { mapActions } from "vuex";
 export default {
-    name: 'SingleRoom',
-    props: {
-        roomId: {
-            type: String,
-            required: true,
-        },
+  name: "SingleRoom",
+  props: {
+    roomId: {
+      type: String,
+      required: true,
     },
-    methods: {
-        ...mapActions(["joinRoom"])
-    }
-}
+  },
+  methods: {
+    ...mapActions(["joinRoom"]),
+  },
+};
 </script>
 <style lang="scss">
 .single-room {
-    border: 2px black;
-    border-radius: 5px;
-    text-align: center;
+  border: 2px black;
+  border-radius: 5px;
+  text-align: center;
 }
 </style>

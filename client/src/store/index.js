@@ -18,10 +18,12 @@ export default createStore({
     roomList: [],
 
     roomId: "",
+    playerColor: 2,
 
     isMyTurn: false,
     inRoom: false,
     canJoinRoom: true,
+    isJoinningRoom: false,
   },
   getters: {
     isSwapPossible: (state) => {
@@ -68,6 +70,15 @@ export default createStore({
           break;
       }
       return swap
+    },
+    firstCellCorrectColor: state => index => {
+      if (state.selectedCells.length != 0) {
+        return true
+      } else {
+        if (state.cellsColor.at(index) == state.playerColor) {
+          return true
+        } else { return false }
+      }
     }
   },
   mutations: {
@@ -92,6 +103,7 @@ export default createStore({
         state.cellsColor[index1] = state.cellsColor.at(index3)
         state.cellsColor[index3] = tempCellColor
       }
+      state.isMyTurn = false
     },
     addCellIndex: (state, index) => {
       state.selectedCells.push(index)
@@ -138,9 +150,9 @@ export default createStore({
           str2["A", "R", "0"]
           for (let i = 0; i < arr.length; i++) {
             let newIndexPos = index + arr[i]
-            let newIndexPosDelta = index + (arr[i]/2)
+            let newIndexPosDelta = index + (arr[i] / 2)
             let newIndexNeg = index - arr[i]
-            let newIndexNegDelta = index - (arr[i]/2)
+            let newIndexNegDelta = index - (arr[i] / 2)
             if (newIndexPos < len && (newIndexPos) % 5 >= index % 5 && !str2.includes(state.cells.at(newIndexPos)) && !str2.includes(state.cells.at(newIndexPosDelta))) {
               state.cellsBackColor[newIndexPos] = 2
             }
@@ -154,7 +166,7 @@ export default createStore({
           str2["A", "R", "D", "0"]
           for (let i = 0; i < arr.length; i++) {
             let newIndex = index + arr[i]
-            if ( (0 <= newIndex < len) && !str2.includes(state.cells.at(newIndex))) {
+            if ((0 <= newIndex < len) && !str2.includes(state.cells.at(newIndex))) {
               state.cellsBackColor[newIndex] = 2
             }
           }
@@ -187,14 +199,27 @@ export default createStore({
       }
     },
     createBoard: state => {
-      state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
-      state.cellsColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-      state.cellsBackColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      if (state.isJoinningRoom) {
+        state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
+        state.cellsColor = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        state.cellsBackColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      } else {
+        state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
+        state.cellsColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        state.cellsBackColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      }
+    },
+    invertePlayerMove: (state, moves) => {
+      let invertedMove = []
+      moves.forEach((move) => {
+        invertedMove.push(24 - move)
+      })
+      state.selectedCells = invertedMove
     }
   },
   actions: {
     updateSwapCells: (context, index) => {
-      if (context.state.isMyTurn) {
+      if (context.state.isMyTurn && context.getters.firstCellCorrectColor(index)) {
         context.commit("addCellIndex", index)
         context.commit("changeCellBack", index)
         context.commit("changeAdjacentCellBack", index)
@@ -203,7 +228,6 @@ export default createStore({
           if (context.getters.isSwapPossible) {
             context.commit("swapCells")
             socket.emit('play', context.state.selectedCells)
-            context.state.isMyTurn = false
           }
           context.state.selectedCells = []
           context.commit("refreshCellBack")
@@ -211,31 +235,32 @@ export default createStore({
       }
     },
     otherPlayerMove: (context, move) => {
-      context.state.selectedCells = move
+      context.commit("invertePlayerMove", move)
       context.commit("swapCells")
       context.state.selectedCells = []
     },
     updateRoomList: (context, rooms) => {
       context.state.roomsList = rooms
-      console.log(`the rooms ${context.state.roomsList} are available`)
     },
     createRoom: (context) => {
       socket.emit("createRoom", (roomId) => {
         context.state.roomId = roomId
         context.state.inRoom = true
         context.state.isMyTurn = true
+        context.state.playerColor = 1
         router.push(`/room/${roomId}`)
       })
     },
     joinRoom: (context, roomId) => {
-      console.log(roomId)
-      socket.emit('joinRoom',roomId, (reponse) => {
-        if(reponse) {
+      socket.emit('joinRoom', roomId, (reponse) => {
+        if (reponse) {
           context.state.roomId = roomId
           context.state.inRoom = true
           context.state.isMyTurn = false
+          context.state.isJoinningRoom = true
+          context.state.playerColor = 0
           router.push(`/room/${roomId}`)
-          
+
         } else {
           alert('error Room')
         }
@@ -243,10 +268,12 @@ export default createStore({
     },
     leaveRoom: (context) => {
       socket.emit('leaveRoom', (response) => {
-        if(response) {
+        if (response) {
           router.push('/rooms')
           context.state.inRoom = false
           context.state.roomId = ""
+          context.state.isJoinningRoom = false
+          context.state.playerColor = 2
         }
       })
     },
@@ -254,7 +281,7 @@ export default createStore({
       context.commit("createBoard")
     },
     getBoardFromRoom: (context) => {
-      socket.emit('getBoardFromRoom',context.state.roomId, (response) => {
+      socket.emit('getBoardFromRoom', context.state.roomId, (response) => {
         context.state.cells = response.cells
         context.state.cellsColor = response.cellsColor
         context.state.cellsBackColor = response.cellsBackColor

@@ -1,6 +1,6 @@
 <template>
   <h1>Chenapan en ligne</h1>
-  <router-view/>
+  <router-view />
 </template>
 
 <style lang="scss">
