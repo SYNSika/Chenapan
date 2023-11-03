@@ -1,5 +1,6 @@
 <template>
   <div class="room-list">
+    <p>List des rooms</p>
     <SingleRoom v-for="(room, index) in roomList" :key="index" :roomId="room" />
   </div>
   <button class="create-room-button" @click="createRoom">Créer une room</button>
