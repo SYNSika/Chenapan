@@ -8,6 +8,20 @@ const inArray = (value, arr) => {
   }
   return false
 }
+const arrForV = (index) => {
+  switch(index%5) {
+    case 0:
+      return [-9,-3,7,11]
+    case 1:
+      return [-11,-9,-3,7,9,11]
+    case 2:
+      return [-11,-9,-7,-3,3,7,9,11]
+    case 3:
+      return [-11,-9,-7,3,9,11]
+    case 4:
+      return [-11,-7,3,9]
+  }
+}
 
 export default createStore({
   state: {
@@ -128,11 +142,11 @@ export default createStore({
           for (let i = 0; i < arr.length; i++) {
             let newIndexPos = index + arr[i]
             let newIndexNeg = index - arr[i]
-            if (newIndexPos < len && str2.includes(state.cells.at(newIndexPos))) {
-              state.cellsBackColor[index + arr[i]] = 2
+            if (newIndexPos < len && str2.includes(state.cells.at(newIndexPos)) && (newIndexPos) % 5 >= index % 5) {
+              state.cellsBackColor[newIndexPos] = 2
             }
-            if (newIndexNeg >= 0 && str2.includes(state.cells.at(newIndexNeg))) {
-              state.cellsBackColor[index - arr[i]] = 2
+            if (newIndexNeg >= 0 && str2.includes(state.cells.at(newIndexNeg)) && (newIndexNeg) % 5 <= index % 5) {
+              state.cellsBackColor[newIndexNeg] = 2
             }
           }
           break;
@@ -142,11 +156,11 @@ export default createStore({
           for (let i = 0; i < arr.length; i++) {
             let newIndexPos = index + arr[i]
             let newIndexNeg = index - arr[i]
-            if (newIndexPos < len && !str2.includes(state.cells.at(newIndexPos))) {
-              state.cellsBackColor[index + arr[i]] = 2
+            if (newIndexPos < len && !str2.includes(state.cells.at(newIndexPos)) && (newIndexPos) % 5 >= index % 5) {
+              state.cellsBackColor[newIndexPos] = 2
             }
-            if (newIndexNeg >= 0 && !str2.includes(state.cells.at(newIndexNeg))) {
-              state.cellsBackColor[index - arr[i]] = 2
+            if (newIndexNeg >= 0 && !str2.includes(state.cells.at(newIndexNeg)) && (newIndexNeg) % 5 <= index % 5) {
+              state.cellsBackColor[newIndexNeg] = 2
             }
           }
           break;
@@ -167,7 +181,7 @@ export default createStore({
           }
           break;
         case "V":
-          arr = [3, 7, 9, 11, -3, -7, -9, -11]
+          arr = arrForV(index)
           str2["A", "R", "D", "0"]
           for (let i = 0; i < arr.length; i++) {
             let newIndex = index + arr[i]
@@ -222,12 +236,12 @@ export default createStore({
       state.selectedCells = invertedMove
     },
     isGameOver: (state) => {
-      let pos = [0,1,2,3,4,20,21,22,23,24]
-      for(let i = 0; i<pos.length; i++){
-        if(state.cells.at(pos[i]) === "0") {
+      let pos = [0, 1, 2, 3, 4, 20, 21, 22, 23, 24]
+      for (let i = 0; i < pos.length; i++) {
+        if (state.cells.at(pos[i]) === "0") {
           state.isGameOver = true
           console.log("Partie Terminé")
-          if(pos[i] >= 20) {
+          if (pos[i] >= 20) {
             state.isGameWon = true
             console.log("Partie Gagné")
           }
@@ -235,7 +249,7 @@ export default createStore({
         }
       }
     },
-    updateRoomList: (state,rooms) => {
+    updateRoomList: (state, rooms) => {
       state.roomList = rooms
       console.log(state.roomList)
     }
@@ -265,7 +279,7 @@ export default createStore({
       context.state.selectedCells = []
     },
     updateRoomList: (context, rooms) => {
-      context.commit("updateRoomList",rooms)
+      context.commit("updateRoomList", rooms)
     },
     createRoom: (context) => {
       socket.emit("createRoom", (roomId) => {
