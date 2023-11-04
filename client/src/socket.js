@@ -4,7 +4,9 @@ import store from "./store";
 const apiUrl = process.env.VUE_APP_SERVICE_URL
 
 const apiPort = process.env.VUE_APP_SERCIVE_PORT
-const socket = io(apiUrl + ":" + apiPort)
+const socket = io(apiUrl + ":" + apiPort, {
+    rejectUnauthorized :true
+})
 
 socket.on('play', (move) => {
     store.dispatch('otherPlayerMove', move)
