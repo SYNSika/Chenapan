@@ -240,10 +240,8 @@ export default createStore({
       for (let i = 0; i < pos.length; i++) {
         if (state.cells.at(pos[i]) === "0") {
           state.isGameOver = true
-          console.log("Partie Terminé")
           if (pos[i] >= 20) {
             state.isGameWon = true
-            console.log("Partie Gagné")
           }
           break;
         }
@@ -251,7 +249,6 @@ export default createStore({
     },
     updateRoomList: (state, rooms) => {
       state.roomList = rooms
-      console.log(state.roomList)
     }
   },
   actions: {
