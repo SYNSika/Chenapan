@@ -9,17 +9,17 @@ const inArray = (value, arr) => {
   return false
 }
 const arrForV = (index) => {
-  switch(index%5) {
+  switch (index % 5) {
     case 0:
-      return [-9,-3,7,11]
+      return [-9, -3, 7, 11]
     case 1:
-      return [-11,-9,-3,7,9,11]
+      return [-11, -9, -3, 7, 9, 11]
     case 2:
-      return [-11,-9,-7,-3,3,7,9,11]
+      return [-11, -9, -7, -3, 3, 7, 9, 11]
     case 3:
-      return [-11,-9,-7,3,9,11]
+      return [-11, -9, -7, 3, 9, 11]
     case 4:
-      return [-11,-7,3,9]
+      return [-11, -7, 3, 9]
   }
 }
 
@@ -27,7 +27,7 @@ export default createStore({
   state: {
     cells: [],
     cellsColor: [],
-    cellsBackColor: [],
+    cellsBackColor: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     selectedCells: [],
     roomList: [],
 
@@ -35,9 +35,7 @@ export default createStore({
     playerColor: 2,
 
     isMyTurn: false,
-    inRoom: false,
-    canJoinRoom: true,
-    isJoinningRoom: false,
+    haveOtherPlayerJoin: false,
 
     isGameOver: false,
     isGameWon: false,
@@ -198,12 +196,12 @@ export default createStore({
             let newIndexNeg = index - arr[i]
             if (newIndexPos < len && newIndexPos % 5 >= index % 5 && !str2.includes(state.cells.at(newIndexPos))) {
               if (parseInt(str1) >= parseInt(state.cells.at(newIndexPos)) || state.cells.at(newIndexPos) === "A") {
-                state.cellsBackColor[index + arr[i]] = 2
+                state.cellsBackColor[newIndexPos] = 2
               }
             }
             if (newIndexNeg >= 0 && newIndexNeg % 5 <= index % 5 && !str2.includes(state.cells.at(newIndexNeg))) {
               if (parseInt(str1) >= parseInt(state.cells.at(newIndexNeg) || state.cells.at(newIndexNeg) === "A")) {
-                state.cellsBackColor[index - arr[i]] = 2
+                state.cellsBackColor[newIndexNeg] = 2
               }
 
             }
@@ -217,16 +215,42 @@ export default createStore({
         state.cellsBackColor[i] = 0
       }
     },
+    generateBoard: (state, roomId) => {
+      state.roomId = roomId
+    },
     createBoard: state => {
-      if (state.isJoinningRoom) {
-        state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
-        state.cellsColor = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        state.cellsBackColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      } else {
-        state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
-        state.cellsColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-        state.cellsBackColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      state.isMyTurn = true
+      state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
+      state.playerColor = (Math.floor(Math.random() * 2))
+      switch (state.playerColor) {
+        case 0:
+          state.cellsColor = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          break;
+        case 1:
+          state.cellsColor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+          break;
       }
+    },
+    joinBoard: (state, data) => {
+      console.log(data)
+      console.log(data.color,data.board,data.boardColor)
+      state.isMyTurn = false
+      state.haveOtherPlayerJoin = true
+      if(data.color === 0){
+        state.playerColor = 1
+      } else {
+        state.playerColor = 0
+      }
+      state.cells = data.board.reverse()
+      state.cellsColor = data.boardColor.reverse()
+
+    },
+    leaveRoom: state => {
+      state.roomId = ""
+      state.isGameOver = false
+      state.isGameWon = false
+      state.haveOtherPlayerJoin = false
+      state.playerColor = 2
     },
     invertePlayerMove: (state, moves) => {
       let invertedMove = []
@@ -280,43 +304,37 @@ export default createStore({
     },
     createRoom: (context) => {
       socket.emit("createRoom", (roomId) => {
-        context.state.roomId = roomId
-        context.state.inRoom = true
-        context.state.isMyTurn = true
-        context.state.playerColor = 1
+        context.commit("generateBoard",roomId)
+        context.commit("createBoard")
         router.push(`/room/${roomId}`)
       })
     },
     joinRoom: (context, roomId) => {
-      socket.emit('joinRoom', roomId, (reponse) => {
-        if (reponse) {
-          context.state.roomId = roomId
-          context.state.inRoom = true
-          context.state.isMyTurn = false
-          context.state.isJoinningRoom = true
-          context.state.playerColor = 0
-          router.push(`/room/${roomId}`)
+      socket.emit('joinRoom', roomId, (response) => {
+        if (response) {
+          context.commit("generateBoard",roomId)
+          socket.timeout(3000).emit("getBoard",roomId,(err,data) => {
+            if(err){
+              alert('error room server')
+            } else {
+              console.log(data)
+              context.commit("joinBoard",data[0])
+              router.push(`/room/${roomId}`)
+            }
+          })
 
         } else {
-          alert('error Room')
+          alert('error full Room')
         }
       })
     },
     leaveRoom: (context) => {
       socket.emit('leaveRoom', (response) => {
         if (response) {
+          context.commit("leaveRoom")
           router.push('/rooms')
-          context.state.inRoom = false
-          context.state.roomId = ""
-          context.state.isJoinningRoom = false
-          context.state.playerColor = 2
-          context.state.isGameOver = false
-          context.state.isGameWon = false
         }
       })
-    },
-    generateBoard: (context) => {
-      context.commit("createBoard")
     },
   },
   modules: {

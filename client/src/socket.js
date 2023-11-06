@@ -13,4 +13,13 @@ socket.on('play', (move) => {
 socket.on('getRooms', (rooms) => {
     store.dispatch('updateRoomList', rooms)
 })
+socket.on('getBoardData',(callback) => {
+    store.state.haveOtherPlayerJoin = true
+    let data = {
+        color: store.state.playerColor,
+        board: store.state.cells,
+        boardColor: store.state.cellsColor
+    }
+    callback(data)
+})
 export default socket

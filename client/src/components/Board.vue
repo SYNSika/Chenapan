@@ -1,5 +1,19 @@
 <template>
-    <PopUp :isGameOver="isGameOver" :isGameWon="isGameWon" />
+  <PopUp
+    :bool1="isGameOver"
+    :bool2="isGameWon"
+    :title="'Partie Terminé'"
+    :subtitle1="'Vous avez gagné'"
+    :subtitle2="'Vous avez perdu'"
+    :exitMessage="'Cliquez pour retourner à la liste des rooms'"
+    :exitFunction="leaveRoom"
+  />
+  <PopUp
+  :bool1="!haveOtherPlayerJoin" 
+  :title="'Veuillez attendre un autre joueur va rejoindre la room'"
+  :loading="true"
+  :exitMessage="'Cliquez pour retourner à la liste des rooms'"
+  :exitFunction="leaveRoom"/>
   <div class="board">
     <div class="board-info">
       <p>{{ roomId }}</p>
@@ -26,13 +40,12 @@
 import BoardCell from "./BoardCell.vue";
 import PopUp from "./PopUp.vue";
 import { mapState, mapActions } from "vuex";
-import store from "@/store";
 
 export default {
   name: "GameBoard",
   components: {
     BoardCell,
-    PopUp
+    PopUp,
   },
   computed: {
     ...mapState([
@@ -43,14 +56,12 @@ export default {
       "roomId",
       "isGameOver",
       "isGameWon",
+      "haveOtherPlayerJoin"
     ]),
   },
   methods: {
     ...mapActions(["leaveRoom", "updateSwapCells"]),
-  },
-  beforeCreate() {
-    store.dispatch("generateBoard");
-  },
+  }
 };
 </script>
 

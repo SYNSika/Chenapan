@@ -1,33 +1,59 @@
 <template>
   <Transition name="fade" appear>
-    <div class="popUp-overlay" v-if="isGameOver" @click="leaveRoom"></div>
+    <div class="popUp-overlay" v-if="bool1" @click="exitFunction"></div>
   </Transition>
   <Transition name="fade" appear>
-    <div class="popUp" v-if="isGameOver" @click="leaveRoom">
-      <h3>Partie Terminé</h3>
-      <p v-if="isGameWon">Vous avez gagné</p>
-      <p v-else>Vous avez perdu</p>
-      <p>Cliquez pour quitter la room</p>
+    <div class="popUp" v-if="bool1" @click="exitFunction">
+      <h3>{{ title }}</h3>
+      <hollow-dots-spinner class="spinner"
+        v-if="loading"
+        :animation-duration="1000"
+        :dot-size="15"
+        :dots-num="3"
+        :color="'#ff1d5e'"
+      />
+      <p v-if="bool2">{{ subtitle1 }}</p>
+      <p v-else>{{ subtitle2 }}</p>
+      <p>{{ exitMessage }}</p>
     </div>
   </Transition>
 </template>
 <script>
-import { mapActions } from 'vuex';
+import { HollowDotsSpinner } from "epic-spinners";
 export default {
   name: "PopUp",
+  components: {
+    HollowDotsSpinner,
+  },
   props: {
-    isGameOver: {
+    bool1: {
       type: Boolean,
       required: true,
     },
-    isGameWon: {
+    bool2: {
       type: Boolean,
+    },
+    loading: {
+      type: Boolean,
+    },
+    title: {
+      type: String,
       required: true,
+    },
+    subtitle1: {
+      type: String,
+    },
+    subtitle2: {
+      type: String,
+    },
+    exitMessage: {
+      type: String,
+      required: true,
+    },
+    exitFunction: {
+      type: Function,
     },
   },
-  methods: {
-        ...mapActions(["leaveRoom"])
-    },
 };
 </script>
 <style lang="scss">
@@ -39,6 +65,9 @@ export default {
   bottom: 0;
   z-index: 98;
   background-color: rgba(0, 0, 0, 0.5);
+}
+.spinner {
+  margin: auto;
 }
 .popUp {
   position: fixed;

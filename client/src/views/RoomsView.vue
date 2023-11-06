@@ -8,6 +8,8 @@
 <script>
 import SingleRoom from "@/components/Room.vue";
 import { mapState, mapActions } from "vuex";
+import socket from "@/socket";
+import store from "@/store";
 
 export default {
   name: "RoomsView",
@@ -20,6 +22,11 @@ export default {
   methods: {
     ...mapActions(["createRoom"]),
   },
+  beforeCreate() {
+    socket.emit("getRooms",(rooms) => {
+      store.dispatch("updateRoomList",rooms)
+    })
+  }
 };
 </script>
 <style lang="scss">
