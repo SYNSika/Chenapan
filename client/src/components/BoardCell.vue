@@ -42,6 +42,8 @@ export default {
     value: function (oldValue, newValue) {
       if (oldValue != newValue) {
         this.valueChanged = true;
+        let audio = new Audio(require("@/assets/move-self.mp3"));
+        audio.play();
       }
       setTimeout(() => {
         this.valueChanged = false;
@@ -73,7 +75,6 @@ export default {
         }
       }
     },
-
   },
 };
 </script>

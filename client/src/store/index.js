@@ -119,8 +119,6 @@ export default createStore({
         state.cellsColor[index3] = tempCellColor
       }
       state.isMyTurn = false
-      let audio = new Audio(require('@/assets/move-self.mp3'))
-      audio.play();
     },
     addCellIndex: (state, index) => {
       state.selectedCells.push(index)
@@ -264,7 +262,7 @@ export default createStore({
       for (let i = 0; i < pos.length; i++) {
         if (state.cells.at(pos[i]) === "0") {
           state.isGameOver = true
-          if (pos[i] >= 20) {
+          if (pos[i] <= 4) {
             state.isGameWon = true
           }
           break;
