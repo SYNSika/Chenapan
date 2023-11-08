@@ -34,7 +34,7 @@
       <p v-else>A l'adversaire</p>
     </div>
   </div>
-  <button class="leave-room-button" @click="leaveRoom">Quitter la room</button>
+  <button class="button" @click="leaveRoom">Quitter la room</button>
 </template>
 <script>
 import BoardCell from "./BoardCell.vue";
@@ -82,27 +82,16 @@ export default {
   text-align: center;
 }
 .board-info {
+  margin-left: 10px;
+  margin-right: 10px;
   width: 100px;
   height: 40px;
   text-align: center;
   line-height: 50%;
   border-radius: 5px;
-  background-color: black;
+  background-color: #BBDDE8;
   color: white;
 }
-.leave-room-button {
-  margin-top: 10px;
-  width: 150px;
-  height: 40px;
-  line-height: 50%;
-  text-align: center;
-  border-radius: 5px;
-  background-color: gold;
-}
-.leave-room-button:hover {
-  background-color: goldenrod;
-}
-
 .is-turn_not {
   background-color: gray;
 }

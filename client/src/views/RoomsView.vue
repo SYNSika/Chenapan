@@ -1,9 +1,9 @@
 <template>
   <div class="room-list">
-    <p>List des rooms</p>
+    <h4>List des rooms</h4>
     <SingleRoom v-for="(room, index) in roomList" :key="index" :roomId="room" />
   </div>
-  <button class="create-room-button" @click="createRoom">Créer une room</button>
+  <button class="button" @click="createRoom">Créer une room</button>
 </template>
 <script>
 import SingleRoom from "@/components/Room.vue";
@@ -37,18 +37,5 @@ export default {
   text-align: center;
   font-size: large;
   vertical-align: auto;
-}
-.create-room-button {
-  margin: auto;
-  margin-top: 10px;
-  width: 150px;
-  height: 40px;
-  line-height: 50%;
-  text-align: center;
-  border-radius: 5px;
-  background-color: gold;
-}
-.create-room-button:hover {
-  background-color: goldenrod;
 }
 </style>

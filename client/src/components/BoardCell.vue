@@ -2,7 +2,7 @@
   <div
     class="board-cell"
     @click="updateSwapCells(index)"
-    :style="{ backgroundColor: translateBackColor, color: translateColor }"
+    :style="{ backgroundColor: translateBackColor, color: translateColor}"
     :class="{ 'board-cell_fading': valueChanged }"
   >
     {{ value }}
@@ -63,13 +63,13 @@ export default {
     },
     translateBackColor() {
       if (this.valueChanged) {
-        return "rgba(216,251,48,0.8050070369944853)";
+        return "rgba(176,167,200,0.805)";
       } else {
         switch (this.backColor) {
           case 1:
-            return "lightblue";
+            return "rgba(183,209,178,0.805)";
           case 2:
-            return "lightgreen";
+            return "rgba(126,117,150,0.805)";
           default:
             return "white";
         }
@@ -82,7 +82,6 @@ export default {
 .board-cell {
   width: 100%;
   height: 100%;
-  border: 1px solid black;
   border-radius: 5px;
   text-align: center;
   line-height: 300%;

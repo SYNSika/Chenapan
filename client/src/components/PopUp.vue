@@ -10,7 +10,7 @@
         :animation-duration="1000"
         :dot-size="15"
         :dots-num="3"
-        :color="'#ff1d5e'"
+        :color="'#81B431'"
       />
       <p v-if="bool2">{{ subtitle1 }}</p>
       <p v-else>{{ subtitle2 }}</p>
@@ -78,7 +78,7 @@ export default {
   z-index: 99;
   width: 100%;
   max-width: 400px;
-  background-color: #fff;
+  background-color: #E7D5CE;
   border-radius: 16px;
 
   padding: 25px;
