@@ -1,6 +1,6 @@
 <template>
-    <h4>Vous êtes sur la page d'accueil</h4>
-    <button class="button" @click="goToBoard">Accéder à liste des rooms</button>
+    <h4>{{ $t('homeText') }}</h4>
+    <button class="button" @click="goToBoard">{{ $t('homeButton') }}</button>
 </template>
 
 <script>

@@ -2,17 +2,17 @@
   <PopUp
     :bool1="isGameOver"
     :bool2="isGameWon"
-    :title="'Partie Terminé'"
-    :subtitle1="'Vous avez gagné'"
-    :subtitle2="'Vous avez perdu'"
-    :exitMessage="'Cliquez pour retourner à la liste des rooms'"
+    :title="$t('PopUpGameOver')"
+    :subtitle1="$t('PopUpGameWon')"
+    :subtitle2="$t('PopUpGameLost')"
+    :exitMessage="$t('PopUpLeaving')"
     :exitFunction="leaveRoom"
   />
   <PopUp
   :bool1="!haveOtherPlayerJoin" 
-  :title="'Veuillez attendre un autre joueur va rejoindre la room'"
+  :title="$t('PopUpWaiting')"
   :loading="true"
-  :exitMessage="'Cliquez pour retourner à la liste des rooms'"
+  :exitMessage="$t('PopUpLeaving')"
   :exitFunction="leaveRoom"/>
   <div class="board">
     <div class="board-info">
@@ -30,11 +30,11 @@
       />
     </div>
     <div class="board-info" :class="[isMyTurn ? '' : 'is-turn_not']">
-      <p v-if="isMyTurn">A votre tour</p>
-      <p v-else>A l'adversaire</p>
+      <p v-if="isMyTurn">{{ $t('yourTurn') }}</p>
+      <p v-else>{{ $t('opponentTurn') }}</p>
     </div>
   </div>
-  <button class="button" @click="leaveRoom">Quitter la room</button>
+  <button class="button" @click="leaveRoom"><p>{{ $t('leaveRoomButton') }}</p></button>
 </template>
 <script>
 import BoardCell from "./BoardCell.vue";
@@ -84,7 +84,7 @@ export default {
 .board-info {
   margin-left: 10px;
   margin-right: 10px;
-  width: 100px;
+  width: 125px;
   height: 40px;
   text-align: center;
   line-height: 50%;

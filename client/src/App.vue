@@ -1,5 +1,10 @@
 <template>
-  <h1>Chenapan en ligne</h1>
+  <h1>{{ $t('title') }}</h1>
+  <div class="locale-changer">
+    <select v-model="$i18n.locale">
+      <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{ locale }}</option>
+    </select>
+  </div>
   <router-view />
 </template>
 
@@ -23,14 +28,22 @@
   margin-bottom: 10px;
   width: 150px;
   height: 40px;
-  line-height: normal;
+  line-height: 50%;
+  font-weight: bold;
   text-align: center;
   border-radius: 5px;
   background-color: #bbdde8;
+  color: white;
   border: none;
 }
 .button:hover {
   background-color: #c5e7f2;
   cursor: pointer;
+}
+.locale-changer {
+  position: absolute;
+  top: 4%;
+  right: 20%;
+  appearance: none;
 }
 </style>

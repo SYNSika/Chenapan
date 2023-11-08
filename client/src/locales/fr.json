@@ -1,0 +1,17 @@
+{
+    "title": "Chenapan en ligne",
+    "homeText": "Vous êtes sur la page d'acceuil",
+    "homeButton": "Accéder à la liste des salles",
+    "roomList":"Liste des salles",
+    "createRoomButton": "Créer une salle",
+    "yourTurn": "A vous de jouer",
+    "opponentTurn": "A l'adversaire",
+    "leaveRoomButton": "Quitter la salle",
+    "PopUpGameOver": "Partie terminée",
+    "PopUpGameWon": "Vous avez gagné",
+    "PopUpGameLost": "Vous avez perdu",
+    "PopUpWaiting":"Veuillez attendre un autre joueur va rejoindre la salle",
+    "PopUpLeaving": "Cliquer pour quitter la salle",
+    "ruleTitle": "Games rules",
+    "ruleText":"The goal of the game is to place the '0'pieces to the last line on the oponents side"
+}

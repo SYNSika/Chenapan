@@ -1,0 +1,17 @@
+{
+    "title": "Chenapan online",
+    "homeText": "You are at the Home page",
+    "homeButton": "Acces room's list",
+    "roomList":"Room's list",
+    "createRoomButton": "Create a room",
+    "yourTurn": "it's your turn",
+    "opponentTurn": "opponent's turn",
+    "leaveRoomButton": "Leave Room",
+    "PopUpGameOver": "Game Over",
+    "PopUpGameWon": "You won the game",
+    "PopUpGameLost": "You lost the game",
+    "PopUpWaiting":"Please wait for an opponent to join the room",
+    "PopUpLeaving": "Click to leave the room",
+    "ruleTitle": "Games rules",
+    "ruleText":"The goal of the game is to place the '0'pieces to the last line on the oponents side"
+}

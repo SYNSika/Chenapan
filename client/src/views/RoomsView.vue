@@ -1,9 +1,9 @@
 <template>
   <div class="room-list">
-    <h4>List des rooms</h4>
+    <h4>{{ $t('roomList') }}</h4>
     <SingleRoom v-for="(room, index) in roomList" :key="index" :roomId="room" />
   </div>
-  <button class="button" @click="createRoom">Créer une room</button>
+  <button class="button" @click="createRoom">{{ $t('createRoomButton') }}</button>
 </template>
 <script>
 import SingleRoom from "@/components/Room.vue";
