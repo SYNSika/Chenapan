@@ -12,7 +12,7 @@ let rooms = []
 
 io.on('connection', (socket) => {
     console.log('A user just connected ' + socket.id)
-
+    socket.emit('connected')
     socket.on('play', (move) => {
         let playerRoom = rooms.find(room => room.playersList.includes(socket.id))
         if (playerRoom != undefined) {
@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
     })
     socket.on('leaveRoom', (callback) => {
         let index = rooms.findIndex(room => room.playersList.includes(socket.id))
-        if (index === undefined) {
+        if (index === -1) {
             console.log("the player was not in any room")
             callback(false)
         } else {
@@ -82,6 +82,24 @@ io.on('connection', (socket) => {
             }
             callback(data)
         })
+    })
+    socket.on('disconnect', () => {
+        console.log(`User ${socket.id} has been disconnected`)
+        let index = rooms.findIndex(room => room.playersList.includes(socket.id))
+        if (index === -1) {
+        } else {
+            let roomId = rooms[index].roomId
+            rooms[index].playersList = rooms[index].playersList.filter(name => name != socket.id)
+            socket.leave(roomId)
+            console.log(`user ${socket.id} just leave the room : ${roomId}`)
+            if (rooms[index].playersList.length === 0) {
+                rooms = rooms.filter(room => room.roomId != roomId)
+                let roomsId = getList(rooms)
+                io.emit('getRooms', roomsId)
+                console.log(`The room ${roomId} has been removed`)
+            }
+
+        }
     })
 })
 
