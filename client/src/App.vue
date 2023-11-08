@@ -28,7 +28,7 @@
   margin-bottom: 10px;
   width: 150px;
   height: 40px;
-  line-height: 50%;
+  line-height: normal;
   font-weight: bold;
   text-align: center;
   border-radius: 5px;

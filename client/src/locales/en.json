@@ -13,5 +13,5 @@
     "PopUpWaiting":"Please wait for an opponent to join the room",
     "PopUpLeaving": "Click to leave the room",
     "ruleTitle": "Games rules",
-    "ruleText":"The goal of the game is to place the '0'pieces to the last line on the oponents side"
+    "ruleText":"Your goal is to move the 0 tile to the other side of the board to win.\nTo do this, you must move your tiles by exchanging their positions with a tile of a smaller value.\nLetters cannot touch the 0 tile.\nNumbers move one tile orthogonally.\nThe Jack (V) is stronger than the 9 and moves like a knight in chess, in an L-shape.\nThe Queen (D) is stronger than the Jack and moves two tiles orthogonally.\nThe King (R) is stronger than the Queen and moves one tile orthogonally and diagonally.\nThe Ace (A) is stronger than the King and moves in the same way as the King.\nBe careful, the Ace is the strongest among the letters but the weakest among the numbers!"
 }
