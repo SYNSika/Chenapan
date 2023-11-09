@@ -2,12 +2,6 @@ import { createStore } from 'vuex'
 import router from '@/router'
 import socket from '@/socket'
 
-const inArray = (value, arr) => {
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] === value) { return true }
-  }
-  return false
-}
 const arrForV = (index) => {
   switch (index % 5) {
     case 0:
@@ -57,13 +51,24 @@ const arrForD = (index) => {
   }
 }
 const arrForRnA = (index) => {
-  switch (index % 4) {
+  switch (index % 5) {
     case 0:
       return [-5, -4, 1, 5, 6]
     case 4:
       return [-6, -5, -1, 4, 5]
     default:
       return [-6, -5, -4, -1, 1, 4, 5, 6]
+  }
+}
+
+const arrForNumber = (index) => {
+  switch(index % 5) {
+    case 0:
+      return [-5,1,5]
+    case 4:
+      return [-5,-1,5]
+    default:
+      return [-5,-1,1,5]
   }
 }
 
@@ -95,34 +100,34 @@ export default createStore({
 
       const delta = index2 - index1
       let swap = false
-      switch (str1) {
-        case "0":
-          break;
+      switch (state.cells.at(index1)) {
         case "A":
-          if (str2 === "R" && inArray(delta, arrForRnA(index1))) {
+          console.log(str1,str2)
+          if (str2 === "R" && arrForRnA(index1).includes(delta)) {
             swap = true
           }
           break;
         case "R":
-          if (str2 != "A" && str2 != "0" && inArray(delta, arrForRnA(index1))) {
+          console.log(str1,str2)
+          if (str2 != "A" && str2 != "0" && arrForRnA(index1).includes(delta)) {
             swap = true
           }
           break;
         case "D":
-          if (str2 != "R" && str2 != "0" && str3 != "R" && str3 != "0" && inArray(delta, arrForD(index1))) {
+          console.log(str1,str2)
+          if (str2 != "R" && str2 != "0" && str3 != "R" && str3 != "0" && arrForD(index1).includes(delta)) {
             swap = true
           }
           break;
         case "V":
-          if (str2 != "R" && str2 != "0" && str2 != "D" && inArray(delta, arrForV(index1))) {
+          console.log(str1,str2)
+          if (str2 != "R" && str2 != "0" && str2 != "D" && arrForV(index1).includes(delta)) {
             swap = true
           }
           break;
         default:
-          if (str2 != "R" && str2 != "D" && str2 != "V" && inArray(delta, [1, 5])) {
-            if (parseInt(str1) >= parseInt(str2)) {
-              swap = true
-            } else if (str2 === "A") {
+          if (str2 != "R" && str2 != "D" && str2 != "V" && arrForNumber(index1).includes(delta)) {
+            if (parseInt(state.cells.at(index1)) >= parseInt(state.cells.at(index2)) || str2 === "A") {
               swap = true
             }
           }
@@ -146,8 +151,8 @@ export default createStore({
       let index2 = state.selectedCells.at(1)
       let tempCell = state.cells.at(index2)
       let tempCellColor = state.cellsColor.at(index2)
-      if (state.cells.at(index1) === "D" && (Math.abs(index2 -index1) == 2 ||Math.abs(index2 -index1) == 10 )) {
-        let index3 = index1 + (index2 - index1)/2
+      if (state.cells.at(index1) === "D" && (Math.abs(index2 - index1) == 2 || Math.abs(index2 - index1) == 10)) {
+        let index3 = index1 + (index2 - index1) / 2
         state.cells[index2] = state.cells.at(index1)
         state.cells[index1] = state.cells.at(index3)
         state.cells[index3] = tempCell
@@ -155,7 +160,7 @@ export default createStore({
         state.cellsColor[index2] = state.cellsColor.at(index1)
         state.cellsColor[index1] = state.cellsColor.at(index3)
         state.cellsColor[index3] = tempCellColor
-        
+
       } else {
         state.cells[index2] = state.cells.at(index1)
         state.cells[index1] = tempCell
@@ -204,7 +209,7 @@ export default createStore({
             let newIndex = index + arr[i]
             if (Math.abs(arr[i]) === 2 || Math.abs(arr[i]) === 10) {
               let newIndexDelta = index + (arr[i] / 2)
-              
+
               if (!str2.includes(state.cells.at(newIndex)) && !str2.includes(state.cells.at(newIndexDelta))) {
                 state.cellsBackColor[newIndex] = 2
               }
@@ -269,7 +274,6 @@ export default createStore({
       }
     },
     joinBoard: (state, data) => {
-      state.isMyTurn = false
       state.haveOtherPlayerJoin = true
       if (data.color === 0) {
         state.playerColor = 1
@@ -278,6 +282,7 @@ export default createStore({
       }
       state.cells = data.board.reverse()
       state.cellsColor = data.boardColor.reverse()
+      state.isMyTurn = !data.isMyTurn
 
     },
     leaveRoom: state => {
@@ -307,7 +312,14 @@ export default createStore({
       }
     },
     updateRoomList: (state, rooms) => {
-      state.roomList = rooms
+      let roomslist = []
+      if (rooms != null) {
+        rooms.forEach(room => {
+          roomslist.push({ roomId: room.roomId, isAvailable: room.isAvailable })
+        })
+      }
+      console.log(roomslist)
+      state.roomList = roomslist
     }
   },
   actions: {
@@ -318,6 +330,7 @@ export default createStore({
         context.commit("changeAdjacentCellBack", index)
 
         if (context.state.selectedCells.length === 2) {
+          console.log(context.getters.isSwapPossible)
           if (context.getters.isSwapPossible) {
             context.commit("swapCells")
             context.commit("isGameOver")

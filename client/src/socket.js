@@ -19,11 +19,11 @@ socket.on('getRooms', (rooms) => {
 })
 socket.on('getBoardData',(callback) => {
     store.state.haveOtherPlayerJoin = true
-    store.state.isMyTurn = true
     let data = {
         color: store.state.playerColor,
         board: store.state.cells,
-        boardColor: store.state.cellsColor
+        boardColor: store.state.cellsColor,
+        isMyTurn: store.state.isMyTurn
     }
     callback(data)
 })

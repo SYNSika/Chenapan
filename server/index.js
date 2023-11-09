@@ -25,11 +25,11 @@ io.on('connection', (socket) => {
         let room = {
             roomId: roomId,
             playersList: [socket.id],
+            isAvailable: true,
         }
         rooms.push(room)
         socket.join(roomId)
-        let roomsId = getList(rooms)
-        io.emit('getRooms', roomsId)
+        io.emit('getRooms', rooms)
         callback(roomId)
         console.log('new room created')
     })
@@ -39,13 +39,17 @@ io.on('connection', (socket) => {
         if (index == -1) {
             console.log("this room doesn't existed")
             callback(false)
-        } else if (rooms[index].playersList.length >= 2) {
+        } else if (!rooms[index].isAvailable) {
             console.log('this room is full')
             callback(false)
         } else {
             socket.join(roomId)
             socket.broadcast.to(roomId).emit('rivalJoin')
             rooms[index].playersList.push(socket.id)
+            if(rooms[index].playersList.length == 2){
+                rooms[index].isAvailable = false
+            }
+            io.emit('getRooms', rooms)
             callback(true)
             console.log(`user ${socket.id} joined the room ${roomId}`)
         }
@@ -58,21 +62,20 @@ io.on('connection', (socket) => {
         } else {
             let roomId = rooms[index].roomId
             rooms[index].playersList = rooms[index].playersList.filter(name => name != socket.id)
+            rooms[index].isAvailable = true
             socket.leave(roomId)
             console.log(`user ${socket.id} just leave the room : ${roomId}`)
             if (rooms[index].playersList.length === 0) {
                 rooms = rooms.filter(room => room.roomId != roomId)
-                let roomsId = getList(rooms)
-                io.emit('getRooms', roomsId)
                 console.log(`The room ${roomId} has been removed`)
             }
+            io.emit('getRooms', rooms)
             callback(true)
         }
     })
     socket.on('getRooms', (callback) => {
         rooms = rooms.filter(room => room.playersList.length != 0)
-        let roomsId = getList(rooms)
-        callback(roomsId)
+        callback(rooms)
     })
     socket.on('getBoard',async (roomId,callback) => {
         let id = getRoomCreatorId(roomId)
@@ -90,6 +93,7 @@ io.on('connection', (socket) => {
         } else {
             let roomId = rooms[index].roomId
             rooms[index].playersList = rooms[index].playersList.filter(name => name != socket.id)
+            rooms[index].isAvailable = true
             socket.leave(roomId)
             console.log(`user ${socket.id} just leave the room : ${roomId}`)
             if (rooms[index].playersList.length === 0) {

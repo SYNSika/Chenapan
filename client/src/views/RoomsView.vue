@@ -1,7 +1,7 @@
 <template>
   <div class="room-list">
     <h4>{{ $t('roomList') }}</h4>
-    <SingleRoom v-for="(room, index) in roomList" :key="index" :roomId="room" />
+    <SingleRoom v-for="(room, index) in roomList" :key="index" :roomId="room.roomId" :isAvailable="room.isAvailable" />
   </div>
   <button class="button" @click="createRoom">{{ $t('createRoomButton') }}</button>
 </template>

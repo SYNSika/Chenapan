@@ -1,5 +1,5 @@
 <template>
-  <div class="single-room" @click="joinRoom(roomId)">
+  <div class="single-room" @click="joinRoom(roomId)" :style="{color: isRoomAvailableColor}">
     <p>{{ roomId }}</p>
   </div>
 </template>
@@ -12,6 +12,18 @@ export default {
       type: String,
       required: true,
     },
+    isAvailable: {
+      type: Boolean,
+      required: true
+    }
+  },
+  computed: {
+    isRoomAvailableColor(){
+      if(this.isAvailable) {
+        return "green"
+      }
+      return "red"
+    }
   },
   methods: {
     ...mapActions(["joinRoom"]),
