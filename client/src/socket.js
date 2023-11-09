@@ -11,8 +11,10 @@ socket.on('connected',() => {
     router.push('/')
 })
 socket.on('play', (move) => {
-    store.dispatch('otherPlayerMove', move)
+    if(!store.state.isSpectator) {
+        store.dispatch('otherPlayerMove', move)
     store.state.isMyTurn = true
+    }
 })
 socket.on('getRooms', (rooms) => {
     store.dispatch('updateRoomList', rooms)

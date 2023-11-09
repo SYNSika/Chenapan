@@ -29,7 +29,10 @@
         :updateSwapCells="updateSwapCells"
       />
     </div>
-    <div class="board-info" :class="[isMyTurn ? '' : 'is-turn_not']">
+    <div class="board-info" :style="{backgroundColor: 'gray' }" v-if="isSpectator">
+      <p>{{ $t('spectator') }}</p>
+    </div>
+    <div class="board-info" :class="[isMyTurn ? '' : 'is-turn_not']" v-else>
       <p v-if="isMyTurn">{{ $t('yourTurn') }}</p>
       <p v-else>{{ $t('opponentTurn') }}</p>
     </div>
@@ -56,7 +59,8 @@ export default {
       "roomId",
       "isGameOver",
       "isGameWon",
-      "haveOtherPlayerJoin"
+      "haveOtherPlayerJoin",
+      "isSpectator",
     ]),
   },
   methods: {

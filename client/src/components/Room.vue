@@ -1,6 +1,7 @@
 <template>
-  <div class="single-room" @click="joinRoom(roomId)" :style="{color: isRoomAvailableColor}">
-    <p>{{ roomId }}</p>
+  <div class="single-room" @click="joinRoom(this.roomId)" :style="{color: isRoomAvailableColor}">
+    <p v-if="isAvailable">{{ roomId }}</p>
+    <p v-else>{{roomId + $t('joinSpectator')}}</p>
   </div>
 </template>
 <script>

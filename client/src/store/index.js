@@ -62,13 +62,13 @@ const arrForRnA = (index) => {
 }
 
 const arrForNumber = (index) => {
-  switch(index % 5) {
+  switch (index % 5) {
     case 0:
-      return [-5,1,5]
+      return [-5, 1, 5]
     case 4:
-      return [-5,-1,5]
+      return [-5, -1, 5]
     default:
-      return [-5,-1,1,5]
+      return [-5, -1, 1, 5]
   }
 }
 
@@ -84,17 +84,20 @@ export default createStore({
     playerColor: 2,
 
     isMyTurn: false,
+    isSpectator: false,
     haveOtherPlayerJoin: false,
 
     isGameOver: false,
     isGameWon: false,
   },
   getters: {
+    getRoom: (state) => {
+      return state.roomList.find(room => room.roomId === state.roomId)
+    },
     isSwapPossible: (state) => {
       let index1 = state.selectedCells.at(0)
       let index2 = state.selectedCells.at(1)
 
-      let str1 = state.cells.at(index1)
       let str2 = state.cells.at(index2)
       let str3 = state.cells.at(index1 + (index2 - index1) / 2)
 
@@ -102,25 +105,21 @@ export default createStore({
       let swap = false
       switch (state.cells.at(index1)) {
         case "A":
-          console.log(str1,str2)
           if (str2 === "R" && arrForRnA(index1).includes(delta)) {
             swap = true
           }
           break;
         case "R":
-          console.log(str1,str2)
           if (str2 != "A" && str2 != "0" && arrForRnA(index1).includes(delta)) {
             swap = true
           }
           break;
         case "D":
-          console.log(str1,str2)
           if (str2 != "R" && str2 != "0" && str3 != "R" && str3 != "0" && arrForD(index1).includes(delta)) {
             swap = true
           }
           break;
         case "V":
-          console.log(str1,str2)
           if (str2 != "R" && str2 != "0" && str2 != "D" && arrForV(index1).includes(delta)) {
             swap = true
           }
@@ -275,22 +274,28 @@ export default createStore({
     },
     joinBoard: (state, data) => {
       state.haveOtherPlayerJoin = true
-      if (data.color === 0) {
+      if (data.data.color === 0) {
         state.playerColor = 1
       } else {
         state.playerColor = 0
       }
-      state.cells = data.board.reverse()
-      state.cellsColor = data.boardColor.reverse()
-      state.isMyTurn = !data.isMyTurn
-
+      state.cells = data.data.board.reverse()
+      state.cellsColor = data.data.boardColor.reverse()
+      state.isMyTurn = !data.data.isMyTurn
+      if(!data.isAvailable) {
+        state.isSpectator = true
+      }
     },
     leaveRoom: state => {
       state.roomId = ""
+      state.cells = []
+      state.cellsBackColor = []
+      state.cellsColor = []
       state.isGameOver = false
       state.isGameWon = false
       state.haveOtherPlayerJoin = false
       state.playerColor = 2
+      state.isSpectator = false
     },
     invertePlayerMove: (state, moves) => {
       let invertedMove = []
@@ -318,26 +323,26 @@ export default createStore({
           roomslist.push({ roomId: room.roomId, isAvailable: room.isAvailable })
         })
       }
-      console.log(roomslist)
       state.roomList = roomslist
     }
   },
   actions: {
     updateSwapCells: (context, index) => {
-      if (context.state.isMyTurn && context.getters.firstCellCorrectColor(index) && !context.state.isGameOver) {
-        context.commit("addCellIndex", index)
-        context.commit("changeCellBack", index)
-        context.commit("changeAdjacentCellBack", index)
+      if (!context.state.isSpectator) {
+        if (context.state.isMyTurn && context.getters.firstCellCorrectColor(index) && !context.state.isGameOver) {
+          context.commit("addCellIndex", index)
+          context.commit("changeCellBack", index)
+          context.commit("changeAdjacentCellBack", index)
 
-        if (context.state.selectedCells.length === 2) {
-          console.log(context.getters.isSwapPossible)
-          if (context.getters.isSwapPossible) {
-            context.commit("swapCells")
-            context.commit("isGameOver")
-            socket.emit('play', context.state.selectedCells)
+          if (context.state.selectedCells.length === 2) {
+            if (context.getters.isSwapPossible) {
+              context.commit("swapCells")
+              context.commit("isGameOver")
+              socket.emit('play', context.state.selectedCells)
+            }
+            context.state.selectedCells = []
+            context.commit("refreshCellBack")
           }
-          context.state.selectedCells = []
-          context.commit("refreshCellBack")
         }
       }
     },
@@ -361,11 +366,12 @@ export default createStore({
       socket.emit('joinRoom', roomId, (response) => {
         if (response) {
           context.commit("generateBoard", roomId)
+          let room = context.getters.getRoom
           socket.timeout(3000).emit("getBoard", roomId, (err, data) => {
             if (err) {
               alert('error room server')
             } else {
-              context.commit("joinBoard", data[0])
+              context.commit("joinBoard", {data :data[0],isAvailable:room.isAvailable})
               router.push(`/room/${roomId}`)
             }
           })

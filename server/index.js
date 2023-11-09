@@ -26,6 +26,7 @@ io.on('connection', (socket) => {
             roomId: roomId,
             playersList: [socket.id],
             isAvailable: true,
+            spectatorList: []
         }
         rooms.push(room)
         socket.join(roomId)
@@ -34,52 +35,63 @@ io.on('connection', (socket) => {
         console.log('new room created')
     })
     socket.on('joinRoom', (roomId, callback) => {
-        console.log(roomId)
         let index = rooms.findIndex(room => room.roomId == roomId)
         if (index == -1) {
             console.log("this room doesn't existed")
             callback(false)
         } else if (!rooms[index].isAvailable) {
-            console.log('this room is full')
-            callback(false)
+            socket.join(roomId)
+            rooms[index].spectatorList.push(socket.id)
+            console.log(`User ${socket.id} joined room ${roomId} as spectator`)
+            callback(true)
         } else {
             socket.join(roomId)
             socket.broadcast.to(roomId).emit('rivalJoin')
             rooms[index].playersList.push(socket.id)
-            if(rooms[index].playersList.length == 2){
+            if (rooms[index].playersList.length == 2) {
                 rooms[index].isAvailable = false
             }
-            io.emit('getRooms', rooms)
             callback(true)
-            console.log(`user ${socket.id} joined the room ${roomId}`)
+            setTimeout(() => { io.emit('getRooms', rooms) },1000)
+            console.log(`user ${socket.id} joined the room ${roomId} as player`)
         }
     })
     socket.on('leaveRoom', (callback) => {
-        let index = rooms.findIndex(room => room.playersList.includes(socket.id))
-        if (index === -1) {
-            console.log("the player was not in any room")
+        let indexPlayer = rooms.findIndex(room => room.playersList.includes(socket.id))
+        let indexSpec = rooms.findIndex(room => room.spectatorList.includes(socket.id))
+        if (indexPlayer === -1 && indexSpec === -1) {
+            console.log("the user was not in any room")
             callback(false)
         } else {
-            let roomId = rooms[index].roomId
-            rooms[index].playersList = rooms[index].playersList.filter(name => name != socket.id)
-            rooms[index].isAvailable = true
-            socket.leave(roomId)
-            console.log(`user ${socket.id} just leave the room : ${roomId}`)
-            if (rooms[index].playersList.length === 0) {
-                rooms = rooms.filter(room => room.roomId != roomId)
-                console.log(`The room ${roomId} has been removed`)
+            if (indexPlayer != -1) {
+                let roomId = rooms[indexPlayer].roomId
+                rooms[indexPlayer].playersList = rooms[indexPlayer].playersList.filter(name => name != socket.id)
+                rooms[indexPlayer].isAvailable = true
+                socket.leave(roomId)
+                console.log(`player ${socket.id} just leave the room : ${roomId}`)
+                if (rooms[indexPlayer].playersList.length === 0) {
+                    rooms = rooms.filter(room => room.roomId != roomId)
+                    console.log(`The room ${roomId} has been removed`)
+                }
+                io.emit('getRooms', rooms)
+                callback(true)
             }
-            io.emit('getRooms', rooms)
-            callback(true)
+            if(indexSpec != -1) {
+                let roomId = rooms[indexSpec].roomId
+                rooms[indexSpec].spectatorList = rooms[indexSpec].spectatorList.filter(name => name != socket.id)
+                socket.leave(roomId)
+                console.log(`spectator ${socket.id} just leave the room : ${roomId}`)
+                callback(true)
+            }
         }
     })
     socket.on('getRooms', (callback) => {
         rooms = rooms.filter(room => room.playersList.length != 0)
         callback(rooms)
     })
-    socket.on('getBoard',async (roomId,callback) => {
+    socket.on('getBoard', async (roomId, callback) => {
         let id = getRoomCreatorId(roomId)
-        await io.to(id).timeout(3000).emit('getBoardData', (err,data) => { 
+        await io.to(id).timeout(3000).emit('getBoardData', (err, data) => {
             if (err) {
                 callback(null)
             }
@@ -88,21 +100,28 @@ io.on('connection', (socket) => {
     })
     socket.on('disconnect', () => {
         console.log(`User ${socket.id} has been disconnected`)
-        let index = rooms.findIndex(room => room.playersList.includes(socket.id))
-        if (index === -1) {
-        } else {
-            let roomId = rooms[index].roomId
-            rooms[index].playersList = rooms[index].playersList.filter(name => name != socket.id)
-            rooms[index].isAvailable = true
+        let indexPlayer = rooms.findIndex(room => room.playersList.includes(socket.id))
+        let indexSpec = rooms.findIndex(room => room.spectatorList.includes(socket.id))
+        if (indexPlayer != -1) {
+            let roomId = rooms[indexPlayer].roomId
+            rooms[indexPlayer].playersList = rooms[indexPlayer].playersList.filter(name => name != socket.id)
+            rooms[indexPlayer].isAvailable = true
             socket.leave(roomId)
-            console.log(`user ${socket.id} just leave the room : ${roomId}`)
-            if (rooms[index].playersList.length === 0) {
+            console.log(`player ${socket.id} just leave the room : ${roomId}`)
+            if (rooms[indexPlayer].playersList.length === 0) {
                 rooms = rooms.filter(room => room.roomId != roomId)
                 let roomsId = getList(rooms)
                 io.emit('getRooms', roomsId)
                 console.log(`The room ${roomId} has been removed`)
             }
 
+        }
+        if(indexSpec != -1) {
+            let roomId = rooms[indexPlayer].roomId
+            rooms[indexPlayer].spectatorList = rooms[indexPlayer].spectatorList.filter(name => name != socket.id)
+            socket.leave(roomId)
+            console.log(`spectator ${socket.id} just leave the room : ${roomId}`)
+            callback(true)
         }
     })
 })
