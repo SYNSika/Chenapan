@@ -22,6 +22,50 @@ const arrForV = (index) => {
       return [-11, -7, 3, 9]
   }
 }
+const arrForD = (index) => {
+  switch (index % 5) {
+    case 0:
+      if ((index - 10) < 0) {
+        return [-5, 2, 10]
+      } else if (index + 10 > 25) {
+        return [-10, 2, 5]
+      } else { return [-10, 2, 10] }
+    case 1:
+      if ((index - 10) < 0) {
+        return [-5, -1, 2, 10]
+      } else if (index + 10 > 25) {
+        return [-10, -1, 2, 5]
+      } else { return [-10, -1, 2, 10] }
+    case 2:
+      if ((index - 10) < 0) {
+        return [-5, -2, 2, 10]
+      } else if (index + 10 > 25) {
+        return [-10, -2, 2, 5]
+      } else { return [-10, -2, 2, 10] }
+    case 3:
+      if ((index - 10) < 0) {
+        return [-5, -2, 1, 10]
+      } else if (index + 10 > 25) {
+        return [-10, -2, 1, 5]
+      } else { return [-10, -2, 1, 10] }
+    case 4:
+      if ((index - 10) < 0) {
+        return [-5, -2, 10]
+      } else if (index + 10 > 25) {
+        return [-10, -2, 5]
+      } else { return [-10, -2, 10] }
+  }
+}
+const arrForRnA = (index) => {
+  switch (index % 4) {
+    case 0:
+      return [-5, -4, 1, 5, 6]
+    case 4:
+      return [-6, -5, -1, 4, 5]
+    default:
+      return [-6, -5, -4, -1, 1, 4, 5, 6]
+  }
+}
 
 export default createStore({
   state: {
@@ -49,28 +93,28 @@ export default createStore({
       let str2 = state.cells.at(index2)
       let str3 = state.cells.at(index1 + (index2 - index1) / 2)
 
-      const delta = Math.abs(index2 - index1)
+      const delta = index2 - index1
       let swap = false
       switch (str1) {
         case "0":
           break;
         case "A":
-          if (str2 === "R" && inArray(delta, [1, 4, 5, 6])) {
+          if (str2 === "R" && inArray(delta, arrForRnA(index1))) {
             swap = true
           }
           break;
         case "R":
-          if (str2 != "A" && str2 != "0" && inArray(delta, [1, 4, 5, 6])) {
+          if (str2 != "A" && str2 != "0" && inArray(delta, arrForRnA(index1))) {
             swap = true
           }
           break;
         case "D":
-          if (str2 != "R" && str2 != "0" && str3 != "R" && str3 != "0" && inArray(delta, [2, 10])) {
+          if (str2 != "R" && str2 != "0" && str3 != "R" && str3 != "0" && inArray(delta, arrForD(index1))) {
             swap = true
           }
           break;
         case "V":
-          if (str2 != "R" && str2 != "0" && str2 != "D" && inArray(delta, [3, 7, 9, 11])) {
+          if (str2 != "R" && str2 != "0" && str2 != "D" && inArray(delta, arrForV(index1))) {
             swap = true
           }
           break;
@@ -100,16 +144,10 @@ export default createStore({
     swapCells: (state) => {
       let index1 = state.selectedCells.at(0)
       let index2 = state.selectedCells.at(1)
-      let index3 = index1 + ((index2 - index1) / 2)
       let tempCell = state.cells.at(index2)
       let tempCellColor = state.cellsColor.at(index2)
-      if (state.cells.at(index1) != "D") {
-        state.cells[index2] = state.cells.at(index1)
-        state.cells[index1] = tempCell
-
-        state.cellsColor[index2] = state.cellsColor.at(index1)
-        state.cellsColor[index1] = tempCellColor
-      } else {
+      if (state.cells.at(index1) === "D" && (Math.abs(index2 -index1) == 2 ||Math.abs(index2 -index1) == 10 )) {
+        let index3 = index1 + (index2 - index1)/2
         state.cells[index2] = state.cells.at(index1)
         state.cells[index1] = state.cells.at(index3)
         state.cells[index3] = tempCell
@@ -117,6 +155,13 @@ export default createStore({
         state.cellsColor[index2] = state.cellsColor.at(index1)
         state.cellsColor[index1] = state.cellsColor.at(index3)
         state.cellsColor[index3] = tempCellColor
+        
+      } else {
+        state.cells[index2] = state.cells.at(index1)
+        state.cells[index1] = tempCell
+
+        state.cellsColor[index2] = state.cellsColor.at(index1)
+        state.cellsColor[index1] = tempCellColor
       }
       state.isMyTurn = false
     },
@@ -133,46 +178,40 @@ export default createStore({
       let arr = []
       switch (str1) {
         case "A":
-          arr = [1, 4, 5, 6]
-          str2 = ["R"]
+          arr = arrForRnA(index)
+          str2 = ["R", "D", "V"]
           for (let i = 0; i < arr.length; i++) {
-            let newIndexPos = index + arr[i]
-            let newIndexNeg = index - arr[i]
-            if (newIndexPos < len && str2.includes(state.cells.at(newIndexPos)) && (newIndexPos) % 5 >= index % 5) {
-              state.cellsBackColor[newIndexPos] = 2
-            }
-            if (newIndexNeg >= 0 && str2.includes(state.cells.at(newIndexNeg)) && (newIndexNeg) % 5 <= index % 5) {
-              state.cellsBackColor[newIndexNeg] = 2
+            let newIndex = index + arr[i]
+            if (0 <= newIndex < len && str2.includes(state.cells.at(newIndex))) {
+              state.cellsBackColor[newIndex] = 2
             }
           }
           break;
         case "R":
-          arr = [1, 4, 5, 6]
+          arr = arrForRnA(index)
           str2 = ["A", "0"]
           for (let i = 0; i < arr.length; i++) {
-            let newIndexPos = index + arr[i]
-            let newIndexNeg = index - arr[i]
-            if (newIndexPos < len && !str2.includes(state.cells.at(newIndexPos)) && (newIndexPos) % 5 >= index % 5) {
-              state.cellsBackColor[newIndexPos] = 2
-            }
-            if (newIndexNeg >= 0 && !str2.includes(state.cells.at(newIndexNeg)) && (newIndexNeg) % 5 <= index % 5) {
-              state.cellsBackColor[newIndexNeg] = 2
+            let newIndex = index + arr[i]
+            if (0 <= newIndex < len && !str2.includes(state.cells.at(newIndex))) {
+              state.cellsBackColor[newIndex] = 2
             }
           }
           break;
         case "D":
-          arr = [2, 10]
-          str2["A", "R", "0"]
+          arr = arrForD(index)
+          str2 = ["A", "R", "0"]
           for (let i = 0; i < arr.length; i++) {
-            let newIndexPos = index + arr[i]
-            let newIndexPosDelta = index + (arr[i] / 2)
-            let newIndexNeg = index - arr[i]
-            let newIndexNegDelta = index - (arr[i] / 2)
-            if (newIndexPos < len && (newIndexPos) % 5 >= index % 5 && !str2.includes(state.cells.at(newIndexPos)) && !str2.includes(state.cells.at(newIndexPosDelta))) {
-              state.cellsBackColor[newIndexPos] = 2
-            }
-            if (newIndexNeg >= 0 && (newIndexNeg) % 5 <= index % 5 && !str2.includes(state.cells.at(newIndexNeg)) && !str2.includes(state.cells.at(newIndexNegDelta))) {
-              state.cellsBackColor[newIndexNeg] = 2
+            let newIndex = index + arr[i]
+            if (Math.abs(arr[i]) === 2 || Math.abs(arr[i]) === 10) {
+              let newIndexDelta = index + (arr[i] / 2)
+              
+              if (!str2.includes(state.cells.at(newIndex)) && !str2.includes(state.cells.at(newIndexDelta))) {
+                state.cellsBackColor[newIndex] = 2
+              }
+            } else {
+              if (!str2.includes(state.cells.at(newIndex))) {
+                state.cellsBackColor[newIndex] = 2
+              }
             }
           }
           break;
@@ -198,7 +237,7 @@ export default createStore({
               }
             }
             if (newIndexNeg >= 0 && newIndexNeg % 5 <= index % 5 && !str2.includes(state.cells.at(newIndexNeg))) {
-              if (parseInt(str1) >= parseInt(state.cells.at(newIndexNeg) || state.cells.at(newIndexNeg) === "A")) {
+              if (parseInt(str1) >= parseInt(state.cells.at(newIndexNeg)) || state.cells.at(newIndexNeg) === "A") {
                 state.cellsBackColor[newIndexNeg] = 2
               }
 
@@ -230,11 +269,9 @@ export default createStore({
       }
     },
     joinBoard: (state, data) => {
-      console.log(data)
-      console.log(data.color,data.board,data.boardColor)
       state.isMyTurn = false
       state.haveOtherPlayerJoin = true
-      if(data.color === 0){
+      if (data.color === 0) {
         state.playerColor = 1
       } else {
         state.playerColor = 0
@@ -302,7 +339,7 @@ export default createStore({
     },
     createRoom: (context) => {
       socket.emit("createRoom", (roomId) => {
-        context.commit("generateBoard",roomId)
+        context.commit("generateBoard", roomId)
         context.commit("createBoard")
         router.push(`/room/${roomId}`)
       })
@@ -310,13 +347,12 @@ export default createStore({
     joinRoom: (context, roomId) => {
       socket.emit('joinRoom', roomId, (response) => {
         if (response) {
-          context.commit("generateBoard",roomId)
-          socket.timeout(3000).emit("getBoard",roomId,(err,data) => {
-            if(err){
+          context.commit("generateBoard", roomId)
+          socket.timeout(3000).emit("getBoard", roomId, (err, data) => {
+            if (err) {
               alert('error room server')
             } else {
-              console.log(data)
-              context.commit("joinBoard",data[0])
+              context.commit("joinBoard", data[0])
               router.push(`/room/${roomId}`)
             }
           })
