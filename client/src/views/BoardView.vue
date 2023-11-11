@@ -20,6 +20,7 @@ export default {
 <style lang="scss">
 .board-rules {
   margin-left: 2.5%;
+  margin-bottom: 1%;
   width: 95%;
   border-radius: 5px;
   text-align: justify;

@@ -7,19 +7,17 @@ const apiUrl = process.env.VUE_APP_SERVICE_URL
 const apiPort = process.env.VUE_APP_SERCIVE_PORT
 
 const socket = io(apiUrl + ":" + apiPort)
-socket.on('connected',() => {
+socket.on('connected', () => {
     router.push('/')
 })
 socket.on('play', (move) => {
-    if(!store.state.isSpectator) {
-        store.dispatch('otherPlayerMove', move)
-    store.state.isMyTurn = true
-    }
+    store.dispatch('otherPlayerMove', move)
+
 })
 socket.on('getRooms', (rooms) => {
     store.dispatch('updateRoomList', rooms)
 })
-socket.on('getBoardData',(callback) => {
+socket.on('getBoardData', (callback) => {
     store.state.haveOtherPlayerJoin = true
     let data = {
         color: store.state.playerColor,
@@ -28,5 +26,8 @@ socket.on('getBoardData',(callback) => {
         isMyTurn: store.state.isMyTurn
     }
     callback(data)
+})
+socket.on('receivedMessage', (message) => {
+    store.dispatch('receivedMessage', message)
 })
 export default socket

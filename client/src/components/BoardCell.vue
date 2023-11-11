@@ -2,7 +2,7 @@
   <div
     class="board-cell"
     @click="updateSwapCells(index)"
-    :style="{ backgroundColor: translateBackColor, color: translateColor}"
+    :style="{ backgroundColor: translateBackColor, color: translateColor }"
     :class="{ 'board-cell_fading': valueChanged }"
   >
     {{ value }}
@@ -86,5 +86,8 @@ export default {
   text-align: center;
   line-height: 300%;
   transition: background-color 0.5s;
+  &:hover {
+    cursor: pointer;
+  }
 }
 </style>

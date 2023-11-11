@@ -79,8 +79,11 @@ export default createStore({
     cellsBackColor: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     selectedCells: [],
     roomList: [],
+    messages: [],
 
+    currentUser: "",
     roomId: "",
+
     playerColor: 2,
 
     isMyTurn: false,
@@ -261,6 +264,7 @@ export default createStore({
     },
     createBoard: state => {
       state.isMyTurn = true
+      state.currentUser = "player1"
       state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
       state.playerColor = (Math.floor(Math.random() * 2))
       switch (state.playerColor) {
@@ -273,6 +277,7 @@ export default createStore({
       }
     },
     joinBoard: (state, data) => {
+      state.currentUser = "player2"
       state.haveOtherPlayerJoin = true
       if (data.data.color === 0) {
         state.playerColor = 1
@@ -282,15 +287,20 @@ export default createStore({
       state.cells = data.data.board.reverse()
       state.cellsColor = data.data.boardColor.reverse()
       state.isMyTurn = !data.data.isMyTurn
-      if(!data.isAvailable) {
+      if (!data.isAvailable) {
         state.isSpectator = true
+        state.currentUser = "spectator"
+      } else {
+        state.currentUser = "player2"
       }
     },
     leaveRoom: state => {
       state.roomId = ""
+      state.currentUser = ""
       state.cells = []
       state.cellsBackColor = []
       state.cellsColor = []
+      state.messages = []
       state.isGameOver = false
       state.isGameWon = false
       state.haveOtherPlayerJoin = false
@@ -324,6 +334,9 @@ export default createStore({
         })
       }
       state.roomList = roomslist
+    },
+    addMessage: (state, message) => {
+      state.messages = state.messages.concat(message)
     }
   },
   actions: {
@@ -351,6 +364,9 @@ export default createStore({
       context.commit("swapCells")
       context.commit("isGameOver")
       context.state.selectedCells = []
+      if (context.state.isSpectator) {
+        context.state.isMyTurn = true
+      }
     },
     updateRoomList: (context, rooms) => {
       context.commit("updateRoomList", rooms)
@@ -371,7 +387,7 @@ export default createStore({
             if (err) {
               alert('error room server')
             } else {
-              context.commit("joinBoard", {data :data[0],isAvailable:room.isAvailable})
+              context.commit("joinBoard", { data: data[0], isAvailable: room.isAvailable })
               router.push(`/room/${roomId}`)
             }
           })
@@ -389,6 +405,13 @@ export default createStore({
         }
       })
     },
+    sendMessage: (context, message) => {
+      context.commit("addMessage", message)
+      socket.emit('sendMessage', message)
+    },
+    receivedMessage: (context, message) => {
+      context.commit("addMessage", message)
+    }
   },
   modules: {
   }

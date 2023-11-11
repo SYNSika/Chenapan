@@ -19,6 +19,12 @@ io.on('connection', (socket) => {
             socket.broadcast.to(playerRoom.roomId).emit('play', move)
         }
     })
+    socket.on('sendMessage', (message) => {
+        let room = rooms.find(room => room.playersList.includes(socket.id) || room.spectatorList.includes(socket.id))
+        if(room != undefined) {
+            socket.broadcast.to(room.roomId).emit('receivedMessage',message)
+        }
+    })
 
     socket.on('createRoom', (callback) => {
         let roomId = (+new Date).toString(36)
@@ -117,8 +123,8 @@ io.on('connection', (socket) => {
 
         }
         if(indexSpec != -1) {
-            let roomId = rooms[indexPlayer].roomId
-            rooms[indexPlayer].spectatorList = rooms[indexPlayer].spectatorList.filter(name => name != socket.id)
+            let roomId = rooms[indexSpec].roomId
+            rooms[indexSpec].spectatorList = rooms[indexSpec].spectatorList.filter(name => name != socket.id)
             socket.leave(roomId)
             console.log(`spectator ${socket.id} just leave the room : ${roomId}`)
             callback(true)
