@@ -1,0 +1,19 @@
+{
+    "title": "Chenapan en ligne",
+    "homeText": "Vous êtes sur la page d'acceuil",
+    "homeButton": "Accéder à la liste des salles",
+    "roomList": "Liste des salles",
+    "createRoomButton": "Créer une salle",
+    "yourTurn": "A vous de jouer",
+    "opponentTurn": "A l'adversaire",
+    "leaveRoomButton": "Quitter la salle",
+    "PopUpGameOver": "Partie terminée",
+    "PopUpGameWon": "Vous avez gagné",
+    "PopUpGameLost": "Vous avez perdu",
+    "PopUpWaiting": "Veuillez attendre un autre joueur va rejoindre la salle",
+    "PopUpLeaving": "Cliquer pour quitter la salle",
+    "joinSpectator":" (observer la salle)",
+    "spectator":"spectateur",
+    "ruleTitle": "Règles du jeu",
+    "ruleText":"Votre but est de transporter la case 0 de l'autre côté du plateau pour gagner.\nIl faudra pour cela déplacer vos pièces en échangeant leur position avec une pièce de plus petite valeur.\nLes lettres ne peuvent pas toucher à la case 0.\nLes chiffres se déplacent d'une case orthogonale.\nLe Valet (V) est plus fort que le 9 et se déplace comme le cheval aux échecs, en L.\nLa Dame (D) est plus forte que le valet et se déplace de deux cases orthogonalement.\nLe Roi (R) est plus fort que la dame et se déplace d'une case orthogonale et diagonale.\nL'As (A) est plus fort que le roi et se déplace de la même manière que lui.\nAttention, le A est la plus forte des lettres mais le plus faible des chiffres!"
+}

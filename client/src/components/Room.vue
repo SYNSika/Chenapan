@@ -1,6 +1,7 @@
 <template>
-  <div class="single-room" @click="joinRoom(roomId)">
-    <p>{{ roomId }}</p>
+  <div class="single-room" @click="joinRoom(this.roomId)" :style="{color: isRoomAvailableColor}">
+    <p v-if="isAvailable">{{ roomId }}</p>
+    <p v-else>{{roomId + $t('joinSpectator')}}</p>
   </div>
 </template>
 <script>
@@ -12,6 +13,18 @@ export default {
       type: String,
       required: true,
     },
+    isAvailable: {
+      type: Boolean,
+      required: true
+    }
+  },
+  computed: {
+    isRoomAvailableColor(){
+      if(this.isAvailable) {
+        return "green"
+      }
+      return "red"
+    }
   },
   methods: {
     ...mapActions(["joinRoom"]),

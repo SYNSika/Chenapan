@@ -1,5 +1,20 @@
 <template>
-    <PopUp :isGameOver="isGameOver" :isGameWon="isGameWon" />
+  <PopUp
+    :bool1="isGameOver"
+    :bool2="isGameWon"
+    :title="$t('PopUpGameOver')"
+    :subtitle1="$t('PopUpGameWon')"
+    :subtitle2="$t('PopUpGameLost')"
+    :exitMessage="$t('PopUpLeaving')"
+    :exitFunction="leaveRoom"
+  />
+  <PopUp
+    :bool1="!haveOtherPlayerJoin"
+    :title="$t('PopUpWaiting')"
+    :loading="true"
+    :exitMessage="$t('PopUpLeaving')"
+    :exitFunction="leaveRoom"
+  />
   <div class="board">
     <div class="board-info">
       <p>{{ roomId }}</p>
@@ -15,12 +30,37 @@
         :updateSwapCells="updateSwapCells"
       />
     </div>
-    <div class="board-info" :class="[isMyTurn ? '' : 'is-turn_not']">
-      <p v-if="isMyTurn">A votre tour</p>
-      <p v-else>A l'adversaire</p>
+    <div class="board-chat">
+      <div class="board-chat_text">
+        <div v-for="(message, index) in messages" :key="index">
+          <b :style="{ color: colorPlayer(message.user) }">
+            {{ message.user }}
+          </b>
+          : {{ message.text }}
+        </div>
+      </div>
+      <div class="board-chat_input">
+        <form @submit.prevent="sendMessage">
+          <input type="text" v-model="text" />
+          <input type="submit" value="Send" class="board-chat_input_button" />
+        </form>
+      </div>
+    </div>
+    <div
+      class="board-info"
+      :style="{ backgroundColor: 'gray' }"
+      v-if="isSpectator"
+    >
+      <p>{{ $t("spectator") }}</p>
+    </div>
+    <div class="board-info" :class="[isMyTurn ? '' : 'is-turn_not']" v-else>
+      <p v-if="isMyTurn">{{ $t("yourTurn") }}</p>
+      <p v-else>{{ $t("opponentTurn") }}</p>
     </div>
   </div>
-  <button class="leave-room-button" @click="leaveRoom">Quitter la room</button>
+  <button class="button" @click="leaveRoom">
+    <p>{{ $t("leaveRoomButton") }}</p>
+  </button>
 </template>
 <script>
 import BoardCell from "./BoardCell.vue";
@@ -32,7 +72,12 @@ export default {
   name: "GameBoard",
   components: {
     BoardCell,
-    PopUp
+    PopUp,
+  },
+  data() {
+    return {
+      text: "",
+    };
   },
   computed: {
     ...mapState([
@@ -43,13 +88,55 @@ export default {
       "roomId",
       "isGameOver",
       "isGameWon",
+      "haveOtherPlayerJoin",
+      "isSpectator",
+      "messages",
     ]),
   },
   methods: {
     ...mapActions(["leaveRoom", "updateSwapCells"]),
-  },
-  beforeCreate() {
-    store.dispatch("generateBoard");
+    sendMessage() {
+      let message = {
+        user: store.state.currentUser,
+        text: this.text,
+      };
+      store.dispatch("sendMessage", message);
+      this.text = "";
+    },
+    colorPlayer(user) {
+      switch (user) {
+        case "spectator":
+          return "gray";
+        case "player1":
+          if (store.state.currentUser === "player1") {
+            if (store.state.playerColor === 0) {
+              return "black";
+            } else {
+              return "red";
+            }
+          } else {
+            if (store.state.playerColor === 0) {
+              return "red";
+            } else {
+              return "black";
+            }
+          }
+        case "player2":
+          if (store.state.currentUser === "player2") {
+            if (store.state.playerColor === 0) {
+              return "black";
+            } else {
+              return "red";
+            }
+          } else {
+            if (store.state.playerColor === 0) {
+              return "red";
+            } else {
+              return "black";
+            }
+          }
+      }
+    },
   },
 };
 </script>
@@ -70,28 +157,44 @@ export default {
   gap: 10px 10px;
   text-align: center;
 }
+.board-chat {
+  margin-left: 10px;
+  max-width: 250px;
+  max-height: 300px;
+  text-align: left;
+  border: 1px black;
+  scroll-behavior: auto;
+  &_text {
+    overflow-y: auto;
+    height: 95%;
+    background-color: white;
+  }
+  &_input {
+    display: inline-block;
+    border: 1px color;
+    &_button {
+      margin-left: 2px;
+      color: white;
+      background-color: #bbdde8;
+      border: none;
+      &:hover {
+        background-color: #c5e7f2;
+        cursor: pointer;
+      }
+    }
+  }
+}
 .board-info {
-  width: 100px;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 125px;
   height: 40px;
   text-align: center;
   line-height: 50%;
   border-radius: 5px;
-  background-color: black;
+  background-color: #bbdde8;
   color: white;
 }
-.leave-room-button {
-  margin-top: 10px;
-  width: 150px;
-  height: 40px;
-  line-height: 50%;
-  text-align: center;
-  border-radius: 5px;
-  background-color: gold;
-}
-.leave-room-button:hover {
-  background-color: goldenrod;
-}
-
 .is-turn_not {
   background-color: gray;
 }

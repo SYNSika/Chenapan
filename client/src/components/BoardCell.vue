@@ -42,6 +42,8 @@ export default {
     value: function (oldValue, newValue) {
       if (oldValue != newValue) {
         this.valueChanged = true;
+        let audio = new Audio(require("@/assets/move-self.mp3"));
+        audio.play();
       }
       setTimeout(() => {
         this.valueChanged = false;
@@ -61,19 +63,18 @@ export default {
     },
     translateBackColor() {
       if (this.valueChanged) {
-        return "rgba(216,251,48,0.8050070369944853)";
+        return "rgba(176,167,200,0.805)";
       } else {
         switch (this.backColor) {
           case 1:
-            return "lightblue";
+            return "rgba(183,209,178,0.805)";
           case 2:
-            return "lightgreen";
+            return "rgba(126,117,150,0.805)";
           default:
             return "white";
         }
       }
     },
-
   },
 };
 </script>
@@ -81,10 +82,12 @@ export default {
 .board-cell {
   width: 100%;
   height: 100%;
-  border: 1px solid black;
   border-radius: 5px;
   text-align: center;
   line-height: 300%;
   transition: background-color 0.5s;
+  &:hover {
+    cursor: pointer;
+  }
 }
 </style>
