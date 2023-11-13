@@ -2,11 +2,11 @@ import { io } from "socket.io-client";
 import store from "./store";
 import router from "./router";
 
-const apiUrl = process.env.VUE_APP_SERVICE_URL
+const apiUrl = process.env.VUE_APP_SERVICE_SECURE_URL
 
 const apiPort = process.env.VUE_APP_SERCIVE_PORT
 
-const socket = io(apiUrl + ":" + apiPort)
+const socket = io(apiUrl + ":" + apiPort,{secure:true})
 socket.on('connected', () => {
     router.push('/')
 })

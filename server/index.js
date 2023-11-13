@@ -3,7 +3,8 @@ const fs = require('fs')
 const server = require('express')
 const https = require('https').createServer({
     key: fs.readFileSync(process.env.API_PRIVATE_KEY),
-    cert: fs.readFileSync(process.env.API_CERTIFICATE),
+    cert: fs.readFileSync(process.env.API_CERT),
+    ca: fs.readFileSync(process.env.API_CA),
 
     requestCert: false,
     rejectUnauthorized: false
