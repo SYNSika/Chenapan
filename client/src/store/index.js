@@ -364,7 +364,7 @@ export default createStore({
       context.commit("swapCells")
       context.commit("isGameOver")
       context.state.selectedCells = []
-      if (context.state.isSpectator) {
+      if (!context.state.isSpectator) {
         context.state.isMyTurn = true
       }
     },
