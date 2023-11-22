@@ -82,6 +82,7 @@ export default createStore({
     messages: [],
 
     currentUser: "",
+    opponentUser: "",
     roomId: "",
 
     playerColor: 2,
@@ -264,7 +265,6 @@ export default createStore({
     },
     createBoard: state => {
       state.isMyTurn = true
-      state.currentUser = "player1"
       state.cells = ["8", "V", "R", "D", "9", "7", "4", "A", "6", "5", "3", "2", "0", "2", "3", "5", "6", "A", "4", "7", "9", "D", "R", "V", "8"]
       state.playerColor = (Math.floor(Math.random() * 2))
       switch (state.playerColor) {
@@ -277,7 +277,6 @@ export default createStore({
       }
     },
     joinBoard: (state, data) => {
-      state.currentUser = "player2"
       state.haveOtherPlayerJoin = true
       if (data.data.color === 0) {
         state.playerColor = 1
@@ -287,16 +286,14 @@ export default createStore({
       state.cells = data.data.board.reverse()
       state.cellsColor = data.data.boardColor.reverse()
       state.isMyTurn = !data.data.isMyTurn
+      state.opponentUser = data.data.opponentUsername
       if (!data.isAvailable) {
         state.isSpectator = true
-        state.currentUser = "spectator"
-      } else {
-        state.currentUser = "player2"
       }
     },
     leaveRoom: state => {
       state.roomId = ""
-      state.currentUser = ""
+      state.opponentUser = ""
       state.cells = []
       state.cellsBackColor = []
       state.cellsColor = []
@@ -337,6 +334,9 @@ export default createStore({
     },
     addMessage: (state, message) => {
       state.messages = state.messages.concat(message)
+    },
+    logIn: (state,username) => {
+      state.currentUser = username
     }
   },
   actions: {
@@ -383,7 +383,7 @@ export default createStore({
         if (response) {
           context.commit("generateBoard", roomId)
           let room = context.getters.getRoom
-          socket.timeout(3000).emit("getBoard", roomId, (err, data) => {
+          socket.timeout(3000).emit("getBoard", roomId,context.state.currentUser, (err, data) => {
             if (err) {
               alert('error room server')
             } else {
@@ -411,6 +411,9 @@ export default createStore({
     },
     receivedMessage: (context, message) => {
       context.commit("addMessage", message)
+    },
+    logIn: (context, username) => {
+      context.commit("logIn",username)
     }
   },
   modules: {

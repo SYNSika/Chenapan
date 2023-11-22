@@ -17,9 +17,11 @@ socket.on('play', (move) => {
 socket.on('getRooms', (rooms) => {
     store.dispatch('updateRoomList', rooms)
 })
-socket.on('getBoardData', (callback) => {
+socket.on('getBoardData', (username,callback) => {
     store.state.haveOtherPlayerJoin = true
+    store.state.opponentUser = username
     let data = {
+        opponentUsername: store.state.currentUser,
         color: store.state.playerColor,
         board: store.state.cells,
         boardColor: store.state.cellsColor,

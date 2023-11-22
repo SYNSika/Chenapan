@@ -1,17 +1,15 @@
 <template>
     <h4>{{ $t('homeText') }}</h4>
-    <button class="button" @click="goToBoard">{{ $t('homeButton') }}</button>
+    <Login/>
 </template>
 
 <script>
-import router from '@/router';
+import Login from '@/components/Login.vue';
 
 export default {
-    methods: {
-        goToBoard() {
-            router.push("/rooms")
-        }
-    }
+    components : {
+        Login
+    },
 }
 </script>
 <style lang="scss">

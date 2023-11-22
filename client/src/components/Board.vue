@@ -105,36 +105,20 @@ export default {
     },
     colorPlayer(user) {
       switch (user) {
-        case "spectator":
-          return "gray";
-        case "player1":
-          if (store.state.currentUser === "player1") {
-            if (store.state.playerColor === 0) {
-              return "black";
-            } else {
-              return "red";
-            }
+        case store.state.currentUser :
+          if (store.state.playerColor == 0) {
+            return "black"
           } else {
-            if (store.state.playerColor === 0) {
-              return "red";
-            } else {
-              return "black";
-            }
+            return "red"
           }
-        case "player2":
-          if (store.state.currentUser === "player2") {
-            if (store.state.playerColor === 0) {
-              return "black";
-            } else {
-              return "red";
-            }
+        case store.state.opponentUser :
+          if(store.state.playerColor == 0) {
+            return "red"
           } else {
-            if (store.state.playerColor === 0) {
-              return "red";
-            } else {
-              return "black";
-            }
+            return "black"
           }
+        default :
+          return "gray"
       }
     },
   },

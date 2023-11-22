@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
         socket.join(roomId)
         io.emit('getRooms', rooms)
         callback(roomId)
-        console.log('new room created')
+        console.log('new room created :'+roomId)
     })
     socket.on('joinRoom', (roomId, callback) => {
         let index = rooms.findIndex(room => room.roomId == roomId)
@@ -95,9 +95,9 @@ io.on('connection', (socket) => {
         rooms = rooms.filter(room => room.playersList.length != 0)
         callback(rooms)
     })
-    socket.on('getBoard', async (roomId, callback) => {
+    socket.on('getBoard', async (roomId,username, callback) => {
         let id = getRoomCreatorId(roomId)
-        await io.to(id).timeout(3000).emit('getBoardData', (err, data) => {
+        await io.to(id).timeout(3000).emit('getBoardData',username, (err, data) => {
             if (err) {
                 callback(null)
             }
